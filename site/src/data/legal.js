@@ -3,7 +3,7 @@
 export const legal = {
   slug: "frihat-legal",
   tag: "Frihat Legal",
-  name: "فريحات للمحاماة والاستشارات",
+  name: "فريحات محامون ومستشارون",
   logo: "/brand/logo-legal.png",
   heroImage: "/brand/office-2.jpg",
   heroTagline: "خبرة قانونية راسخة تمتد لأكثر من 16 عامًا",

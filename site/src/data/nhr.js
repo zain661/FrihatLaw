@@ -1,7 +1,7 @@
 export const nhr = {
   slug: "kayan-nhr",
   tag: "Kayan NHR",
-  name: "شركة كيان NHR لإدارة الموارد البشرية",
+  name: "شركة كيان NHR للموارد البشرية",
   tagline: "شريكك المهني في الموارد البشرية",
   heroImage: "/brand/office-2.jpg",
   heroTagline:

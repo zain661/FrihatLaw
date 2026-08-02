@@ -7,9 +7,9 @@ export const brand = {
 export const nav = [
   { label: "الرئيسية", to: "/" },
   { label: "من نحن", to: "/#about" },
-  { label: "فريحات للمحاماة", to: "/frihat-legal" },
-  { label: "الملكية الفكرية", to: "/frihat-ip" },
-  { label: "كيان للموارد البشرية", to: "/kayan-nhr" },
+  { label: "فريحات محامون ومستشارون", to: "/frihat-legal" },
+  { label: "شركة فريحات للملكية الفكرية", to: "/frihat-ip" },
+  { label: "شركة كيان NHR للموارد البشرية", to: "/kayan-nhr" },
   { label: "فريق العمل", to: "/team" },
   { label: "المقالات والمدونة", to: "/blog" },
 ];

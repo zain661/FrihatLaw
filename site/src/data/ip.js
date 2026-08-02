@@ -1,11 +1,11 @@
 export const ip = {
   slug: "frihat-ip",
   tag: "Frihat Intellectual Property",
-  name: "فريحات لخدمات الملكية الفكرية",
+  name: "شركة فريحات للملكية الفكرية",
   logo: "/brand/logo-ip.png",
   heroImage: "/brand/office-height-1.jpg",
   heroHeadline: "نحمي أفكارك... ونحوّل الابتكار إلى قيمة",
-  heroBrand: "فريحات جروب للملكية الفكرية | Freihat IP",
+  heroBrand: "شركة فريحات للملكية الفكرية | Freihat IP",
   heroTagline:
     "حماية إبداعك، وتأسيس مستقبلك القانوني على المستويين المحلي والدولي. نحن نوفر الحصانة القانونية لابتكاراتك في عالم يتطور باستمرار.",
   presenceBadges: [

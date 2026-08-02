@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>فريحات جروب | منظومة متكاملة للقانون والأعمال</title>
+<meta name="description" content="مجموعة مؤسسية تجمع الخبرة القانونية، حماية الملكية الفكرية، وحلول رأس المال البشري لدعم الأفراد والشركات.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;600;700;800;900&family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- Loader -->
+<div class="loader" id="loader">
+  <div class="loader-inner">
+    <div class="loader-mark">FG</div>
+    <div class="loader-bar"><span id="loaderProgress"></span></div>
+    <div class="loader-label">جارِ التحميل<span class="loader-dots"><i>.</i><i>.</i><i>.</i></span></div>
+  </div>
+</div>
+
+<!-- Background ambience -->
+<div class="bg-orbs" aria-hidden="true">
+  <span class="orb orb-1"></span>
+  <span class="orb orb-2"></span>
+  <span class="orb orb-3"></span>
+</div>
+<div class="bg-grid" aria-hidden="true"></div>
+
+<!-- Navbar -->
+<header class="navbar" id="navbar">
+  <div class="navbar-inner">
+    <a href="#top" class="brand">
+      <img src="assets/logo-crop-preview.png" alt="فريحات جروب" class="brand-logo" id="brandLogo">
+      <span class="brand-text">
+        <strong>فريحات</strong>
+        <em>GROUP</em>
+      </span>
+    </a>
+    <nav class="nav-links">
+      <a href="#about">من نحن</a>
+      <a href="#divisions">قطاعاتنا</a>
+      <a href="#cta">تواصل معنا</a>
+    </nav>
+    <a href="#cta" class="btn btn-nav">اكتشف المجموعة</a>
+    <button class="nav-toggle" id="navToggle" aria-label="القائمة">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<!-- Mobile nav -->
+<div class="mobile-nav" id="mobileNav">
+  <a href="#about">من نحن</a>
+  <a href="#divisions">قطاعاتنا</a>
+  <a href="#cta">تواصل معنا</a>
+</div>
+
+<main id="top">
+
+  <!-- Hero intro -->
+  <section class="hero-intro">
+    <p class="eyebrow">منظومة فريحات المؤسسية</p>
+    <h1>
+      <span>فريحات</span>
+      <span class="accent-gold">جروب</span>
+    </h1>
+    <h2>منظومة متكاملة<br>للقانون والأعمال</h2>
+    <p class="hero-desc">
+      مجموعة مؤسسية تجمع الخبرة القانونية، حماية الملكية الفكرية،
+      وحلول رأس المال البشري لدعم الأفراد والشركات.
+    </p>
+    <div class="hero-chips">
+      <span class="chip">Frihat Legal</span>
+      <span class="chip">Intellectual Property</span>
+      <span class="chip">Kayan NHR</span>
+    </div>
+    <div class="hero-actions">
+      <a href="#cta" class="btn btn-primary" id="discoverBtn">اكتشف المجموعة</a>
+      <a href="#cta" class="btn btn-secondary">تواصل معنا</a>
+    </div>
+    <div class="scroll-cue">
+      <span>مرّر للأسفل</span>
+      <div class="scroll-cue-line"><i></i></div>
+    </div>
+  </section>
+
+  <!-- Sticky scroll canvas -->
+  <section class="scroll-stage" id="scrollStage">
+    <div class="stage-sticky">
+      <canvas id="frameCanvas"></canvas>
+
+      <div class="stage-progress">
+        <div class="stage-progress-bar" id="stageProgressBar"></div>
+      </div>
+
+      <div class="annotation" data-range="0,0.30" id="anno-legal">
+        <span class="annotation-index">01</span>
+        <h3>فريحات ليجال</h3>
+        <p>خبرة قانونية متخصصة في القانون الدولي وتمثيل الأفراد والشركات بأعلى معايير الحوكمة.</p>
+      </div>
+
+      <div class="annotation" data-range="0.32,0.62" id="anno-hr">
+        <span class="annotation-index">02</span>
+        <h3>كيان للموارد البشرية</h3>
+        <p>حلول متكاملة لرأس المال البشري وتطوير المؤسسات، من التوظيف إلى بناء الكفاءات.</p>
+      </div>
+
+      <div class="annotation" data-range="0.64,0.95" id="anno-ip">
+        <span class="annotation-index">03</span>
+        <h3>الملكية الفكرية</h3>
+        <p>حماية العلامات التجارية وبراءات الاختراع وحقوق الابتكار محلياً وإقليمياً.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- About -->
+  <section class="about" id="about">
+    <div class="about-inner">
+      <p class="eyebrow">من نحن</p>
+      <h2>ثلاث قطاعات، رؤية واحدة</h2>
+      <p class="about-text">
+        فريحات جروب مجموعة مؤسسية تجمع تحت مظلة واحدة الخبرة القانونية،
+        حماية الملكية الفكرية، وحلول رأس المال البشري — لتقديم منظومة
+        متكاملة تدعم الأفراد والشركات في كل مرحلة من مراحل نموهم.
+      </p>
+    </div>
+  </section>
+
+  <!-- Divisions -->
+  <section class="divisions" id="divisions">
+    <p class="eyebrow center">قطاعاتنا</p>
+    <h2 class="center">منظومة متكاملة تحت مظلة واحدة</h2>
+
+    <div class="division-grid">
+      <article class="division-card">
+        <div class="division-icon">⚖</div>
+        <span class="division-tag">01 · Frihat Legal</span>
+        <h3>فريحات ليجال</h3>
+        <p>تمثيل قانوني وتحكيم تجاري وخدمات استشارية للشركات والأفراد وفق أعلى المعايير الدولية.</p>
+      </article>
+
+      <article class="division-card featured">
+        <div class="division-icon">🏢</div>
+        <span class="division-tag">02 · Kayan NHR</span>
+        <h3>كيان للموارد البشرية</h3>
+        <p>تطوير رأس المال البشري، التوظيف الاستراتيجي، وبناء الأنظمة المؤسسية للنمو المستدام.</p>
+      </article>
+
+      <article class="division-card">
+        <div class="division-icon">💡</div>
+        <span class="division-tag">03 · Intellectual Property</span>
+        <h3>الملكية الفكرية</h3>
+        <p>حماية العلامات التجارية وبراءات الاختراع وإدارة أصول الابتكار محلياً وإقليمياً.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta" id="cta">
+    <div class="cta-inner">
+      <p class="eyebrow center">ابدأ اليوم</p>
+      <h2>هل أنت جاهز للانضمام إلى منظومة فريحات؟</h2>
+      <p class="cta-desc">تواصل مع فريقنا لمناقشة احتياجاتك القانونية أو المؤسسية أو حماية ملكيتك الفكرية.</p>
+      <div class="cta-actions">
+        <button class="btn btn-primary btn-lg" id="ctaConfettiBtn">اكتشف المجموعة</button>
+        <a href="mailto:info@frihatgroup.com" class="btn btn-secondary btn-lg">تواصل معنا</a>
+      </div>
+    </div>
+    <canvas id="confettiCanvas" aria-hidden="true"></canvas>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <span class="brand-text">
+          <strong>فريحات</strong>
+          <em>GROUP</em>
+        </span>
+        <p>Legal • IP • NHR</p>
+      </div>
+      <nav class="footer-links">
+        <a href="#about">من نحن</a>
+        <a href="#divisions">قطاعاتنا</a>
+        <a href="#cta">تواصل معنا</a>
+      </nav>
+      <p class="footer-copy">© 2026 فريحات جروب. جميع الحقوق محفوظة.</p>
+    </div>
+  </footer>
+
+</main>
+
+<script src="js/main.js"></script>
+</body>
+</html>

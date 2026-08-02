@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 350" width="100%" height="100%">
+  <g fill="#1C3B28">
+    <!-- Bulb Outer Arc Glow -->
+    <path d="M 95 65 A 80 80 0 0 1 205 65" fill="none" stroke="#1C3B28" stroke-width="22" stroke-linecap="round"/>
+    
+    <!-- Main Bulb Body -->
+    <path d="M 150 20 C 80 20, 50 80, 50 140 C 50 185, 85 215, 100 240 L 200 240 C 215 215, 250 185, 250 140 C 250 80, 220 20, 150 20 Z"/>
+    
+    <!-- Registered Trademark Circle inside Bulb -->
+    <circle cx="150" cy="135" r="48" fill="none" stroke="#F7F5EE" stroke-width="18"/>
+    
+    <!-- Letter R inside Circle -->
+    <path d="M 132 110 L 152 110 C 162 110, 168 115, 168 123 C 168 131, 162 136, 152 136 L 132 136 Z M 132 98 L 132 162 M 148 136 L 168 162" fill="none" stroke="#F7F5EE" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+    
+    <!-- Bulb Base Screw Rings -->
+    <rect x="95" y="258" width="110" height="22" rx="11"/>
+    <path d="M 108 290 C 108 290, 115 312, 150 312 C 185 312, 192 290, 192 290 Z"/>
+  </g>
+</svg>

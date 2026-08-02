@@ -1,7 +1,131 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { nav } from "../data/shared";
+
+const COMPANY_PATHS = ["/frihat-legal", "/frihat-ip", "/kayan-nhr"];
+const companyItems = nav.filter((item) => COMPANY_PATHS.includes(item.to));
+
+function ChevronDown({ className = "h-4 w-4" }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <path d="M6 9l6 6 6-6" />
+    </svg>
+  );
+}
+
+function CompaniesDropdown({ dark, active, currentUrl }) {
+  const [open, setOpen] = useState(false);
+  const closeTimer = useRef(null);
+
+  const show = () => {
+    if (closeTimer.current) clearTimeout(closeTimer.current);
+    setOpen(true);
+  };
+  const hide = () => {
+    closeTimer.current = setTimeout(() => setOpen(false), 120);
+  };
+
+  useEffect(() => () => closeTimer.current && clearTimeout(closeTimer.current), []);
+
+  return (
+    <div className="relative" onMouseEnter={show} onMouseLeave={hide}>
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        aria-expanded={open}
+        className={`relative flex w-fit items-center gap-1.5 py-1 transition-colors after:absolute after:-bottom-0.5 after:right-0 after:h-px after:bg-current after:transition-all after:duration-300 ${
+          dark
+            ? active
+              ? "text-[#D4AF37] font-bold border-b-2 border-[#D4AF37] after:w-0"
+              : "text-[#354D40] opacity-80 hover:opacity-100 after:w-0"
+            : active
+              ? "text-gold-light font-bold after:w-full"
+              : "text-cream/90 hover:text-gold-light after:w-0 hover:after:w-full"
+        }`}
+      >
+        شركات المجموعة
+        <ChevronDown className={`h-4 w-4 transition-transform duration-300 ${open ? "rotate-180" : ""}`} />
+      </button>
+
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 8 }}
+            transition={{ duration: 0.18, ease: "easeOut" }}
+            className="absolute right-0 top-full z-[110] mt-3 w-72 rounded-xl border border-white/10 bg-black/80 p-2 shadow-[0_25px_60px_-20px_rgba(0,0,0,0.6)] backdrop-blur-md"
+          >
+            {companyItems.map((item) => {
+              const isActive = currentUrl === item.to || currentUrl.startsWith(item.to);
+              return (
+                <Link
+                  key={item.to}
+                  to={item.to}
+                  onClick={() => setOpen(false)}
+                  className={`block rounded-lg px-4 py-3 text-sm font-semibold transition-colors ${
+                    isActive ? "bg-white/10 text-[#D4AF37]" : "text-cream/90 hover:bg-white/10 hover:text-[#D4AF37]"
+                  }`}
+                >
+                  {item.label}
+                </Link>
+              );
+            })}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+function MobileCompaniesAccordion({ currentUrl, onNavigate }) {
+  const [open, setOpen] = useState(false);
+  const isActive = companyItems.some((item) => currentUrl === item.to || currentUrl.startsWith(item.to));
+
+  return (
+    <div>
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        aria-expanded={open}
+        className={`flex w-full items-center justify-between px-4 py-3.5 rounded-2xl font-semibold transition-colors ${
+          isActive ? "text-green bg-green/8" : "text-ink hover:bg-green/5"
+        }`}
+      >
+        شركات المجموعة
+        <ChevronDown className={`h-4 w-4 transition-transform duration-300 ${open ? "rotate-180" : ""}`} />
+      </button>
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
+            className="overflow-hidden pr-3"
+          >
+            {companyItems.map((item) => {
+              const active = currentUrl === item.to || currentUrl.startsWith(item.to);
+              return (
+                <Link
+                  key={item.to}
+                  to={item.to}
+                  onClick={onNavigate}
+                  className={`block px-4 py-3 rounded-xl text-sm font-semibold transition-colors ${
+                    active ? "text-green bg-green/8" : "text-ink/80 hover:bg-green/5"
+                  }`}
+                >
+                  {item.label}
+                </Link>
+              );
+            })}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -10,6 +134,7 @@ export default function Navbar() {
   const currentUrl = location.pathname + location.hash;
   const forceDark = location.pathname === "/frihat-ip" || location.pathname.startsWith("/team");
   const dark = scrolled || forceDark;
+  const companiesActive = COMPANY_PATHS.some((p) => location.pathname === p || location.pathname.startsWith(p));
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
@@ -17,6 +142,10 @@ export default function Navbar() {
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  const mainItems = nav.slice(1).filter((item) => !COMPANY_PATHS.includes(item.to));
+  const aboutItem = mainItems.find((item) => item.to === "/#about");
+  const restItems = mainItems.filter((item) => item.to !== "/#about");
 
   return (
     <header className="fixed inset-x-0 top-0 z-[100] px-4 md:px-8 pt-4 md:pt-5">
@@ -46,7 +175,26 @@ export default function Navbar() {
             dark ? "text-[#354D40]/80" : "text-cream/90"
           }`}
         >
-          {nav.slice(1).map((item) => {
+          {aboutItem && (
+            <Link
+              to={aboutItem.to}
+              className={`relative w-fit py-1 transition-colors after:absolute after:-bottom-0.5 after:right-0 after:h-px after:bg-current after:transition-all after:duration-300 ${
+                dark
+                  ? currentUrl === aboutItem.to
+                    ? "text-[#D4AF37] font-bold border-b-2 border-[#D4AF37] after:w-0"
+                    : "text-[#354D40] opacity-80 hover:opacity-100 after:w-0"
+                  : currentUrl === aboutItem.to
+                    ? "text-gold-light font-bold after:w-full"
+                    : "text-cream/90 hover:text-gold-light after:w-0 hover:after:w-full"
+              }`}
+            >
+              {aboutItem.label}
+            </Link>
+          )}
+
+          <CompaniesDropdown dark={dark} active={companiesActive} currentUrl={location.pathname} />
+
+          {restItems.map((item) => {
             const active = item.to.includes("#") ? currentUrl === item.to : location.pathname === item.to;
             return (
               <Link
@@ -94,7 +242,21 @@ export default function Navbar() {
             exit={{ opacity: 0, y: -12 }}
             className="lg:hidden mx-auto max-w-[1320px] mt-3 rounded-3xl bg-paper/95 backdrop-blur-xl border border-green/10 shadow-xl p-3 flex flex-col"
           >
-            {nav.slice(1).map((item) => {
+            {aboutItem && (
+              <Link
+                to={aboutItem.to}
+                onClick={() => setOpen(false)}
+                className={`px-4 py-3.5 rounded-2xl font-semibold transition-colors ${
+                  currentUrl === aboutItem.to ? "text-green bg-green/8" : "text-ink hover:bg-green/5"
+                }`}
+              >
+                {aboutItem.label}
+              </Link>
+            )}
+
+            <MobileCompaniesAccordion currentUrl={location.pathname} onNavigate={() => setOpen(false)} />
+
+            {restItems.map((item) => {
               const active = item.to.includes("#") ? currentUrl === item.to : location.pathname === item.to;
               return (
                 <Link

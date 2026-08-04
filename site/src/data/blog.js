@@ -2,7 +2,7 @@ export const CATEGORIES = [
   { key: "legal", label: "المقالات القانونية", emoji: "⚖️", entity: "فريحات للمحاماة", badgeClass: "bg-emerald-100 text-emerald-900 border-emerald-300" },
   { key: "ip", label: "الملكية الفكرية والعلامات", emoji: "💡", entity: "فريحات للملكية الفكرية", badgeClass: "bg-purple-100 text-purple-900 border-purple-300" },
   { key: "hr", label: "حلول الموارد البشرية", emoji: "💻", entity: "كيان NHR", badgeClass: "bg-sky-100 text-sky-900 border-sky-300" },
-  { key: "news", label: "أخبار وفعاليات الجروب", emoji: "📢", entity: "فريحات جروب", badgeClass: "bg-amber-100 text-amber-900 border-amber-300" },
+  { key: "news", label: "أخبار وفعاليات فريحات جروب", emoji: "📢", entity: "فريحات جروب", badgeClass: "bg-amber-100 text-amber-900 border-amber-300" },
 ];
 
 export const FILTERS = [{ key: "all", label: "الكل", emoji: null }, ...CATEGORIES];
@@ -34,7 +34,7 @@ export const seedArticles = [
     category: "legal",
     image: "/brand/office-2.jpg",
     date: "2026-07-20",
-    views: 1240,
+    views: 0,
   },
   {
     id: "seed-2",
@@ -51,7 +51,7 @@ export const seedArticles = [
     category: "ip",
     image: "/brand/ip-collage-trademarks.png",
     date: "2026-07-10",
-    views: 2380,
+    views: 0,
   },
   {
     id: "seed-3",
@@ -68,7 +68,7 @@ export const seedArticles = [
     category: "hr",
     image: "/brand/office-width-1.jpg",
     date: "2026-06-28",
-    views: 860,
+    views: 0,
   },
   {
     id: "seed-4",
@@ -83,7 +83,7 @@ export const seedArticles = [
     category: "news",
     image: "/brand/logo-nhr.png",
     date: "2026-06-15",
-    views: 540,
+    views: 0,
   },
   {
     id: "seed-5",
@@ -100,7 +100,7 @@ export const seedArticles = [
     category: "ip",
     image: "/brand/ip-collage-patents.png",
     date: "2026-05-30",
-    views: 1490,
+    views: 0,
   },
   {
     id: "seed-6",
@@ -117,6 +117,6 @@ export const seedArticles = [
     category: "legal",
     image: "/brand/office-height-1.jpg",
     date: "2026-05-12",
-    views: 1970,
+    views: 0,
   },
 ];

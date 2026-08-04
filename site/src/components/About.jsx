@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, useInView, useReducedMotion, animate } from "framer-motion";
 import { about } from "../data/home";
+import { aboutEn } from "../data/home.en";
+import { useLanguage } from "../lib/LanguageContext";
 
 const containerVariants = {
   hidden: {},
@@ -42,7 +44,9 @@ function useCountUp(target, enabled) {
 
 export default function About() {
   const reduceMotion = useReducedMotion();
-  const match = about.stat.value.match(/^(\D*)(\d+)(\D*)$/);
+  const { lang } = useLanguage();
+  const t = lang === "en" ? aboutEn : about;
+  const match = t.stat.value.match(/^(\D*)(\d+)(\D*)$/);
   const prefix = match?.[1] ?? "";
   const numeric = match ? Number(match[2]) : 0;
   const suffix = match?.[3] ?? "";
@@ -60,13 +64,13 @@ export default function About() {
         variants={containerVariants}
         className="relative mx-auto flex max-w-[1360px] flex-col items-stretch gap-12 md:flex-row md:gap-0"
       >
-        {/* Right column — brand headline + stat */}
-        <motion.div variants={itemVariants} className="md:w-[42%] md:shrink-0 md:pl-14">
+        {/* Start-side column (right in RTL, left in LTR) — brand headline + stat */}
+        <motion.div variants={itemVariants} className="md:w-[42%] md:shrink-0 md:pe-14">
           <h2
             className="font-kufi text-3xl md:text-5xl lg:text-6xl font-extrabold leading-[1.4] tracking-wide mb-8"
             style={{ color: "#111E16" }}
           >
-            {about.title}
+            {t.title}
           </h2>
 
           <div ref={statRef} className="flex items-end gap-4">
@@ -78,22 +82,22 @@ export default function About() {
               {statValue}
               {suffix}
             </p>
-            <p className="mb-2 max-w-[160px] text-sm leading-relaxed text-ink-muted">{about.stat.label}</p>
+            <p className="mb-2 max-w-[160px] text-sm leading-relaxed text-ink-muted">{t.stat.label}</p>
           </div>
         </motion.div>
 
         {/* Delicate vertical gold separator */}
         <div className="hidden w-px shrink-0 self-stretch bg-gold/30 md:block" />
 
-        {/* Left column — full text, wide-stretching */}
-        <motion.div variants={itemVariants} className="flex flex-1 items-center md:pr-14">
+        {/* End-side column (left in RTL, right in LTR) — full text, wide-stretching */}
+        <motion.div variants={itemVariants} className="flex flex-1 items-center md:ps-14">
           <div className="w-full space-y-6 md:max-w-[900px]">
             <p className="text-ink text-xl leading-[1.8] tracking-wide font-medium">
-              {about.bodyLead}
+              {t.bodyLead}
               <span className="font-bold" style={{ color: "#C5A059" }}>
-                {about.bodyHighlight}
+                {t.bodyHighlight}
               </span>
-              {about.bodyTail}
+              {t.bodyTail}
             </p>
           </div>
         </motion.div>

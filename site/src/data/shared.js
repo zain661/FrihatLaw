@@ -11,7 +11,7 @@ export const nav = [
   { label: "شركة فريحات للملكية الفكرية", to: "/frihat-ip" },
   { label: "شركة كيان NHR للموارد البشرية", to: "/kayan-nhr" },
   { label: "فريق العمل", to: "/team" },
-  { label: "المقالات والمدونة", to: "/blog" },
+  { label: "المقالات ", to: "/blog" },
 ];
 
 // Kept separate from `nav` above: the footer's "quick links" column still

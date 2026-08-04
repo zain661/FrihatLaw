@@ -45,6 +45,75 @@ export async function getArticleById(id) {
   return data ? withReadTime(data) : null;
 }
 
+export async function getTrendingArticles(limit = 4) {
+  if (!supabaseConfigured) {
+    return seedArticles
+      .map(withReadTime)
+      .sort((a, b) => (b.views || 0) - (a.views || 0))
+      .slice(0, limit);
+  }
+  const { data, error } = await supabase
+    .from("articles")
+    .select("*")
+    .order("views", { ascending: false })
+    .limit(limit);
+  if (error) throw error;
+  return data.map(withReadTime);
+}
+
+// Best-effort — a failed view count should never break the article page.
+export async function incrementArticleViews(articleId) {
+  if (!supabaseConfigured) return;
+  try {
+    const { error } = await supabase.rpc("increment_views", { article_id: articleId });
+    if (error) throw error;
+  } catch (err) {
+    console.error("Failed to increment article views:", err);
+  }
+}
+
+export async function subscribeToNewsletter(email) {
+  const normalized = email.trim().toLowerCase();
+  if (!supabaseConfigured) {
+    throw new Error("الاشتراك في النشرة غير متاح حاليًا، حاول لاحقًا.");
+  }
+
+  let result;
+  try {
+    result = await supabase.from("newsletter_subscribers").insert({ email: normalized });
+  } catch {
+    throw new Error("تعذّر الاتصال بالخادم، تحقق من اتصالك بالإنترنت وحاول مرة أخرى.");
+  }
+
+  const { error } = result;
+  if (error) {
+    if (error.code === "23505") {
+      throw new Error("هذا البريد الإلكتروني مُشترك بالفعل!");
+    }
+    throw new Error("تعذّر إتمام الاشتراك، حاول مرة أخرى.");
+  }
+}
+
+const IMAGE_BUCKET = "article-images";
+
+// Uploads a cover image to Supabase Storage and returns its public URL —
+// articles store a plain HTTP URL in the `image` column, never raw base64.
+export async function uploadArticleImage(file) {
+  if (!supabaseConfigured) throw new Error(NOT_CONFIGURED_MESSAGE);
+
+  const safeName = file.name.replace(/[^a-zA-Z0-9.\-_]/g, "_");
+  const filePath = `articles/${Date.now()}-${safeName}`;
+
+  const { error } = await supabase.storage.from(IMAGE_BUCKET).upload(filePath, file);
+  if (error) {
+    console.error("Failed to upload article image:", error);
+    throw new Error("تعذّر رفع الصورة، حاول مرة أخرى.");
+  }
+
+  const { data } = supabase.storage.from(IMAGE_BUCKET).getPublicUrl(filePath);
+  return data.publicUrl;
+}
+
 export async function createArticle({ title, content, author, category, image }) {
   if (!supabaseConfigured) throw new Error(NOT_CONFIGURED_MESSAGE);
   const article = {

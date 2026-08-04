@@ -2,7 +2,10 @@ import { useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion, useMotionValueEvent, useScroll, useTransform } from "framer-motion";
 import { legal } from "../data/legal";
+import { legalEn } from "../data/legal.en";
 import { contact } from "../data/shared";
+import { contactEn } from "../data/shared.en";
+import { useLanguage } from "../lib/LanguageContext";
 import LegalHero from "../components/LegalHero";
 import BrandImage from "../components/BrandImage";
 
@@ -71,6 +74,12 @@ const practiceIcons = {
       <path d="M9.5 14.5l2 2 4-4.5" />
     </>
   ),
+  realestate: (
+    <>
+      <path d="M4 11.5 12 4l8 7.5" />
+      <path d="M6 10.5V20a1 1 0 0 0 1 1h3v-6h4v6h3a1 1 0 0 0 1-1v-9.5" />
+    </>
+  ),
 };
 
 function PracticeIcon({ id }) {
@@ -110,22 +119,23 @@ function SectorIcon({ id, className = "h-8 w-8" }) {
   );
 }
 
-function MethodologyTimeline({ steps }) {
+function MethodologyTimeline({ steps, lang }) {
   const containerRef = useRef(null);
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start 0.85", "end 0.6"],
   });
   const lineScale = useTransform(scrollYProgress, [0, 1], [0, 1]);
+  const dir = lang === "ar" ? "rtl" : undefined;
 
   return (
     <div ref={containerRef} className="relative">
       {/* Desktop — alternating zigzag timeline */}
-      <div dir="rtl" className="relative mx-auto hidden max-w-4xl md:block">
-        <div className="absolute right-1/2 top-0 h-full w-[3px] translate-x-1/2 rounded-full bg-[#D4AF37]/15" />
+      <div dir={dir} className="relative mx-auto hidden max-w-4xl md:block">
+        <div className="absolute end-1/2 top-0 h-full w-[3px] translate-x-1/2 rounded-full bg-[#D4AF37]/15" />
         <motion.div
           style={{ scaleY: lineScale }}
-          className="absolute right-1/2 top-0 h-full w-[3px] origin-top translate-x-1/2 rounded-full bg-gradient-to-b from-[#E7C77C] to-[#D4AF37] shadow-[0_0_20px_rgba(212,175,55,0.6)]"
+          className="absolute end-1/2 top-0 h-full w-[3px] origin-top translate-x-1/2 rounded-full bg-gradient-to-b from-[#E7C77C] to-[#D4AF37] shadow-[0_0_20px_rgba(212,175,55,0.6)]"
         />
 
         <div className="relative flex flex-col gap-14">
@@ -133,14 +143,14 @@ function MethodologyTimeline({ steps }) {
             const isStart = i % 2 === 0;
             return (
               <Reveal key={step.title} className={`relative flex ${isStart ? "justify-start" : "justify-end"}`}>
-                <div className={`w-[46%] ${isStart ? "text-right" : "text-left"}`}>
+                <div className={`w-[46%] ${isStart ? "text-start" : "text-end"}`}>
                   <div className="rounded-2xl border border-[#D4AF37]/20 bg-[#21442D] p-6 shadow-[0_15px_35px_-15px_rgba(0,0,0,0.4)]">
                     <h3 className="font-head text-lg font-bold text-[#F4F1EA] mb-2">{step.title}</h3>
                     <p className="text-sm leading-relaxed text-emerald-100/80">{step.desc}</p>
                   </div>
                 </div>
 
-                <div className="absolute right-1/2 top-6 flex h-12 w-12 translate-x-1/2 items-center justify-center rounded-full border-2 border-[#F4F1EA]/10 bg-[#D4AF37] font-head text-sm font-bold text-[#1C3B28] shadow-[0_0_25px_rgba(212,175,55,0.45)]">
+                <div className="absolute end-1/2 top-6 flex h-12 w-12 translate-x-1/2 items-center justify-center rounded-full border-2 border-[#F4F1EA]/10 bg-[#D4AF37] font-head text-sm font-bold text-[#1C3B28] shadow-[0_0_25px_rgba(212,175,55,0.45)]">
                   {String(i + 1).padStart(2, "0")}
                 </div>
               </Reveal>
@@ -150,16 +160,16 @@ function MethodologyTimeline({ steps }) {
       </div>
 
       {/* Mobile — compact vertical step list */}
-      <div dir="rtl" className="relative md:hidden">
-        <div className="absolute right-5 top-0 h-full w-[3px] rounded-full bg-[#D4AF37]/15" />
+      <div dir={dir} className="relative md:hidden">
+        <div className="absolute start-5 top-0 h-full w-[3px] rounded-full bg-[#D4AF37]/15" />
         <motion.div
           style={{ scaleY: lineScale }}
-          className="absolute right-5 top-0 h-full w-[3px] origin-top rounded-full bg-gradient-to-b from-[#E7C77C] to-[#D4AF37] shadow-[0_0_16px_rgba(212,175,55,0.5)]"
+          className="absolute start-5 top-0 h-full w-[3px] origin-top rounded-full bg-gradient-to-b from-[#E7C77C] to-[#D4AF37] shadow-[0_0_16px_rgba(212,175,55,0.5)]"
         />
         <div className="flex flex-col gap-8">
           {steps.map((step, i) => (
-            <Reveal key={step.title} delay={i * 0.05} className="relative pr-16">
-              <div className="absolute right-0 top-0 flex h-10 w-10 items-center justify-center rounded-full border-2 border-[#F4F1EA]/10 bg-[#D4AF37] font-head text-xs font-bold text-[#1C3B28] shadow-[0_0_18px_rgba(212,175,55,0.45)]">
+            <Reveal key={step.title} delay={i * 0.05} className="relative ps-16">
+              <div className="absolute start-0 top-0 flex h-10 w-10 items-center justify-center rounded-full border-2 border-[#F4F1EA]/10 bg-[#D4AF37] font-head text-xs font-bold text-[#1C3B28] shadow-[0_0_18px_rgba(212,175,55,0.45)]">
                 {String(i + 1).padStart(2, "0")}
               </div>
               <div className="rounded-2xl border border-[#D4AF37]/20 bg-[#21442D] p-5">
@@ -177,7 +187,7 @@ function MethodologyTimeline({ steps }) {
 const SECTOR_SLIDE_VW = 82;
 const SECTOR_PEEK_VW = (100 - SECTOR_SLIDE_VW) / 2;
 
-function SectorsHorizontalScroll({ tag, title, items }) {
+function SectorsHorizontalScroll({ tag, title, items, lang, ariaLabel }) {
   const trackRef = useRef(null);
   const { scrollYProgress } = useScroll({
     target: trackRef,
@@ -191,9 +201,10 @@ function SectorsHorizontalScroll({ tag, title, items }) {
   const activeProgress = useTransform(scrollYProgress, [0, 1], [0, items.length - 1]);
   const [activeIndex, setActiveIndex] = useState(0);
   useMotionValueEvent(activeProgress, "change", (v) => setActiveIndex(Math.round(v)));
+  const contentDir = lang === "ar" ? "rtl" : "ltr";
 
   return (
-    <div ref={trackRef} className="relative" style={{ height: `${items.length * 60}vh` }}>
+    <div ref={trackRef} className="relative" style={{ height: `${items.length * 60}vh` }} role="region" aria-roledescription="carousel" aria-label={ariaLabel}>
       <div className="sticky top-20 flex h-[420px] flex-col overflow-hidden md:top-24 md:h-[460px]">
         <div className="shrink-0 border-b border-[#D4AF37]/20 px-6 py-5 text-center md:px-10">
           <p className="font-head text-sm md:text-base tracking-widest leading-relaxed text-[#D4AF37] font-semibold uppercase mb-3">{tag}</p>
@@ -214,6 +225,9 @@ function SectorsHorizontalScroll({ tag, title, items }) {
         </div>
 
         <div className="relative flex-1 overflow-hidden">
+          {/* Kept forced ltr: this is a spatial scroll-jack animation (pixel/vw
+              math), not reading-direction content — the same motion works for
+              both languages. Only the slide content below is direction-aware. */}
           <motion.div dir="ltr" style={{ x }} className="flex h-full">
             {items.map((s) => (
               <div
@@ -221,7 +235,7 @@ function SectorsHorizontalScroll({ tag, title, items }) {
                 className="flex h-full shrink-0 items-center justify-center px-6 md:px-16"
                 style={{ width: `${SECTOR_SLIDE_VW}vw` }}
               >
-                <div dir="rtl" className="flex max-w-3xl flex-col items-center gap-6 text-center md:flex-row md:items-start md:gap-10 md:text-right">
+                <div dir={contentDir} className="flex max-w-3xl flex-col items-center gap-6 text-center md:flex-row md:items-start md:gap-10 md:text-start">
                   <div className="relative flex h-24 w-24 shrink-0 items-center justify-center rounded-full border border-[#D4AF37]/30 bg-[#D4AF37]/10 md:h-28 md:w-28">
                     <div className="absolute inset-0 rounded-full bg-[#D4AF37]/15 blur-xl" />
                     <SectorIcon id={s.icon} className="relative h-12 w-12 text-[#D4AF37] md:h-14 md:w-14" />
@@ -243,7 +257,34 @@ function SectorsHorizontalScroll({ tag, title, items }) {
   );
 }
 
+const COPY = {
+  ar: {
+    practicesHeading: "تغطية قانونية شاملة لاحتياجاتك",
+    discoverMore: "اكتشف المزيد",
+    arrow: "←",
+    ctaHeading: "ابدأ استشارتك القانونية اليوم",
+    ctaPrimary: "حجز استشارة",
+    ctaSecondary: "واتساب",
+    sectorsAria: "كيانات فريحات جروب",
+  },
+  en: {
+    practicesHeading: "Comprehensive Legal Coverage for Your Needs",
+    discoverMore: "Discover More",
+    arrow: "→",
+    ctaHeading: "Start Your Legal Consultation Today",
+    ctaPrimary: "Book a Consultation",
+    ctaSecondary: "WhatsApp",
+    sectorsAria: "Frihat Group Sectors",
+  },
+};
+
 export default function LegalPage() {
+  const { lang } = useLanguage();
+  const t = lang === "en" ? legalEn : legal;
+  const copy = COPY[lang];
+  const activeContact = lang === "en" ? contactEn : contact;
+  const originClass = lang === "en" ? "origin-left" : "origin-right";
+
   return (
     <>
       <LegalHero />
@@ -254,7 +295,7 @@ export default function LegalPage() {
           <Reveal className="lg:col-span-5 relative">
             <div className="relative">
               <div className="aspect-[4/5] rounded-2xl overflow-hidden shadow-2xl relative z-10">
-                <BrandImage src="/brand/office-height-1.jpg" alt={legal.name} className="h-full w-full" fallbackLabel={legal.tag} />
+                <BrandImage src="/brand/office-height-1.jpg" alt={t.name} className="h-full w-full" fallbackLabel={t.tag} />
               </div>
               <div className="absolute -bottom-6 -start-6 w-full h-full border-2 border-[#D4AF37]/60 rounded-2xl -z-0" />
             </div>
@@ -262,18 +303,18 @@ export default function LegalPage() {
 
           <Reveal delay={0.1} className="lg:col-span-7">
             <p className="font-head text-sm md:text-base tracking-widest leading-relaxed text-[#D4AF37] font-semibold uppercase mb-5 flex items-center gap-2">
-              <span className="w-8 h-[2px] bg-[#D4AF37]" /> {legal.intro.title}
+              <span className="w-8 h-[2px] bg-[#D4AF37]" /> {t.intro.title}
             </p>
             <h2 className="font-head text-3xl md:text-4xl font-extrabold text-[#F4F1EA] mb-6 leading-snug">
-              {legal.intro.heading}
+              {t.intro.heading}
             </h2>
             <div className="space-y-5 text-emerald-100/80 text-lg leading-loose mb-8">
-              {legal.intro.paragraphs.map((p) => (
+              {t.intro.paragraphs.map((p) => (
                 <p key={p}>{p}</p>
               ))}
             </div>
             <div className="space-y-3">
-              {legal.intro.checklist.map((item) => (
+              {t.intro.checklist.map((item) => (
                 <div key={item} className="flex items-center gap-3">
                   <span className="material-symbols-outlined text-xl font-bold text-[#D4AF37] shrink-0">check_circle</span>
                   <span className="font-body font-semibold text-[#F4F1EA]">{item}</span>
@@ -288,12 +329,12 @@ export default function LegalPage() {
       <section id="methodology" className="scroll-mt-24 bg-[#1C3B28] pt-12 pb-24 md:pt-16 md:pb-32 px-6 md:px-10">
         <div className="mx-auto max-w-[1100px]">
           <Reveal className="text-center mb-16 max-w-2xl mx-auto">
-            <p className="font-head text-sm md:text-base tracking-widest leading-relaxed text-[#D4AF37] font-semibold uppercase mb-5">{legal.methodology.tag}</p>
-            <h2 className="font-head text-3xl md:text-4xl font-extrabold text-[#F4F1EA]">{legal.methodology.title}</h2>
+            <p className="font-head text-sm md:text-base tracking-widest leading-relaxed text-[#D4AF37] font-semibold uppercase mb-5">{t.methodology.tag}</p>
+            <h2 className="font-head text-3xl md:text-4xl font-extrabold text-[#F4F1EA]">{t.methodology.title}</h2>
             <div className="h-1 w-16 bg-[#D4AF37] mx-auto mt-6 rounded-full" />
           </Reveal>
 
-          <MethodologyTimeline steps={legal.methodology.steps} />
+          <MethodologyTimeline steps={t.methodology.steps} lang={lang} />
         </div>
       </section>
 
@@ -301,18 +342,18 @@ export default function LegalPage() {
       <section id="practices" className="scroll-mt-24 bg-[#1C3B28] py-24 md:py-32 px-6 md:px-10">
         <div className="mx-auto max-w-[1100px]">
           <Reveal className="text-center mb-14 max-w-2xl mx-auto">
-            <p className="font-head text-sm md:text-base tracking-widest leading-relaxed text-[#D4AF37] font-semibold uppercase mb-5">{legal.practiceAreas.title}</p>
-            <h2 className="font-head text-3xl md:text-4xl font-extrabold text-[#F4F1EA]">تغطية قانونية شاملة لاحتياجاتك</h2>
+            <p className="font-head text-sm md:text-base tracking-widest leading-relaxed text-[#D4AF37] font-semibold uppercase mb-5">{t.practiceAreas.title}</p>
+            <h2 className="font-head text-3xl md:text-4xl font-extrabold text-[#F4F1EA]">{copy.practicesHeading}</h2>
             <div className="h-1 w-16 bg-[#D4AF37] mx-auto mt-6 rounded-full" />
           </Reveal>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {legal.practiceAreas.items.map((p, i) => (
+            {t.practiceAreas.items.map((p, i) => (
               <Reveal
                 key={p.name}
                 delay={(i % 3) * 0.08}
                 className="group relative overflow-hidden rounded-2xl bg-[#21442D] border border-[#D4AF37]/20 p-8 flex flex-col hover:shadow-[0_20px_50px_-20px_rgba(212,175,55,0.25)] hover:-translate-y-1 transition-all duration-300"
               >
-                <span className="absolute top-0 right-0 left-0 h-[2px] bg-[#D4AF37] scale-x-0 group-hover:scale-x-100 origin-right transition-transform duration-300" />
+                <span className={`absolute top-0 right-0 left-0 h-[2px] bg-[#D4AF37] scale-x-0 group-hover:scale-x-100 ${originClass} transition-transform duration-300`} />
                 <div className="mb-6 text-[#D4AF37] transition-transform duration-300 group-hover:scale-110">
                   <PracticeIcon id={p.icon} />
                 </div>
@@ -323,14 +364,14 @@ export default function LegalPage() {
                     to={p.href}
                     className="mt-7 flex items-center gap-2 text-sm font-head font-bold text-[#D4AF37] group-hover:gap-3.5 transition-all"
                   >
-                    اكتشف المزيد <span aria-hidden>←</span>
+                    {copy.discoverMore} <span aria-hidden>{copy.arrow}</span>
                   </Link>
                 ) : (
                   <a
                     href="#consult"
                     className="mt-7 flex items-center gap-2 text-sm font-head font-bold text-[#D4AF37] group-hover:gap-3.5 transition-all"
                   >
-                    اكتشف المزيد <span aria-hidden>←</span>
+                    {copy.discoverMore} <span aria-hidden>{copy.arrow}</span>
                   </a>
                 )}
               </Reveal>
@@ -341,7 +382,7 @@ export default function LegalPage() {
 
       {/* Sectors served — horizontal scroll-jacked narrative */}
       <section id="sectors" className="scroll-mt-24 relative bg-[#1C3B28]">
-        <SectorsHorizontalScroll tag={legal.sectors.tag} title={legal.sectors.title} items={legal.sectors.items} />
+        <SectorsHorizontalScroll tag={t.sectors.tag} title={t.sectors.title} items={t.sectors.items} lang={lang} ariaLabel={copy.sectorsAria} />
       </section>
 
       {/* Final CTA — page-local dark variant (shared PageCTA stays untouched for IPPage) */}
@@ -354,26 +395,26 @@ export default function LegalPage() {
             transition={{ duration: 0.7 }}
             className="relative overflow-hidden rounded-[36px] border border-[#D4AF37]/25 bg-[#21442D] px-8 py-16 md:px-16 md:py-20 text-center shadow-[0_30px_70px_-30px_rgba(0,0,0,0.5)]"
           >
-            <div className="absolute -bottom-1/3 -right-1/4 h-[500px] w-[500px] rounded-full bg-[#D4AF37]/10 blur-[120px]" />
+            <div className="absolute -bottom-1/3 -end-1/4 h-[500px] w-[500px] rounded-full bg-[#D4AF37]/10 blur-[120px]" />
             <div className="relative max-w-xl mx-auto">
               <h2 className="font-head text-2xl md:text-4xl font-extrabold leading-tight mb-10 text-[#F4F1EA]">
-                ابدأ استشارتك القانونية اليوم
+                {copy.ctaHeading}
               </h2>
               <div className="flex flex-wrap gap-4 justify-center">
                 <a
-                  href={`mailto:${contact.email}`}
+                  href={`mailto:${activeContact.email}`}
                   className="inline-flex items-center rounded-full px-9 py-4 font-head font-bold transition-colors"
                   style={{ backgroundColor: "#D4AF37", color: "#1C3B28" }}
                 >
-                  حجز استشارة
+                  {copy.ctaPrimary}
                 </a>
                 <a
-                  href={contact.whatsapp}
+                  href={activeContact.whatsapp}
                   target="_blank"
                   rel="noreferrer"
                   className="inline-flex items-center rounded-full border border-[#F4F1EA]/35 px-9 py-4 font-head font-bold text-[#F4F1EA] transition-colors hover:border-[#D4AF37]/70 hover:bg-[#D4AF37]/10"
                 >
-                  واتساب
+                  {copy.ctaSecondary}
                 </a>
               </div>
             </div>

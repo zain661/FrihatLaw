@@ -1,19 +1,44 @@
 import { motion, useReducedMotion } from "framer-motion";
 import { contact } from "../data/shared";
+import { contactEn } from "../data/shared.en";
+import { useLanguage } from "../lib/LanguageContext";
+
+const COPY = {
+  ar: {
+    badge: "فريحات محامون ومستشارون",
+    headline: "نزاهة قانونية.. لحماية تطلعاتك وحفظ حقوقك",
+    tagline: "نقدم حلولاً واستشارات قانونية متكاملة بمهنية عالية ونزاهة مطلقة للأفراد والشركات.",
+    ctaPrimary: "احجز استشارة قانونية",
+    ctaSecondary: "تواصل معنا مباشرة",
+  },
+  en: {
+    badge: "Frihat Legal Consultants",
+    headline: "Legal Integrity — Protecting Your Aspirations and Preserving Your Rights",
+    tagline: "We provide integrated legal solutions and consultations with the highest professionalism and absolute integrity for individuals and companies.",
+    ctaPrimary: "Book a Legal Consultation",
+    ctaSecondary: "Contact Us Directly",
+  },
+};
 
 export default function LegalHero() {
   const reduceMotion = useReducedMotion();
+  const { lang } = useLanguage();
+  const t = COPY[lang];
+  const activeContact = lang === "en" ? contactEn : contact;
+  // In Arabic, the structural wrapper is deliberately forced to dir="ltr" so
+  // "video on the physical left, content on the physical right" holds
+  // regardless of the page's RTL flow. In English that's already the
+  // natural order, so no override is needed.
+  const wrapperDir = lang === "ar" ? "ltr" : undefined;
+  const contentDir = lang === "ar" ? "rtl" : undefined;
 
   return (
     <section className="relative overflow-hidden bg-[#1C3B28] min-h-[100svh] flex items-center">
-      <div className="pointer-events-none absolute -top-32 -right-32 h-[440px] w-[440px] rounded-full bg-[#D4AF37]/10 blur-[140px]" />
-      <div className="pointer-events-none absolute -bottom-24 -left-24 h-[380px] w-[380px] rounded-full bg-[#D4AF37]/10 blur-[120px]" />
+      <div className="pointer-events-none absolute -top-32 -end-32 h-[440px] w-[440px] rounded-full bg-[#D4AF37]/10 blur-[140px]" />
+      <div className="pointer-events-none absolute -bottom-24 -start-24 h-[380px] w-[380px] rounded-full bg-[#D4AF37]/10 blur-[120px]" />
 
       <div className="relative z-10 mx-auto w-full max-w-[1360px] px-6 md:px-10 py-12 lg:py-16">
-        {/* Structural wrapper kept LTR so "video-left, content-right" holds
-            regardless of the page's RTL direction; text inside resets to rtl. */}
-        <div dir="ltr" className="grid gap-12 lg:grid-cols-2 lg:gap-16 items-center">
-          {/* Left: framed, crisp, un-tinted video */}
+        <div dir={wrapperDir} className="grid gap-12 lg:grid-cols-2 lg:gap-16 items-center">
           <motion.div
             initial={reduceMotion ? false : { opacity: 0, x: -24 }}
             animate={{ opacity: 1, x: 0 }}
@@ -43,8 +68,7 @@ export default function LegalHero() {
             </motion.div>
           </motion.div>
 
-          {/* Right: content on the deep-green backdrop */}
-          <div dir="rtl" className="text-right">
+          <div dir={contentDir} className="text-start">
             <motion.span
               initial={reduceMotion ? false : { opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
@@ -56,7 +80,7 @@ export default function LegalHero() {
                 <path d="M12 3v18M5 8l-3 6a4 4 0 0 0 8 0l-3-6h-2Zm14 0l-3 6a4 4 0 0 0 8 0l-3-6h-2Z" />
                 <path d="M4 21h16M5 8h14" />
               </svg>
-              فريحات محامون ومستشارون
+              {t.badge}
             </motion.span>
 
             <motion.h1
@@ -65,7 +89,7 @@ export default function LegalHero() {
               transition={{ duration: 0.8, delay: 0.1 }}
               className="font-head font-black leading-[1.3] text-3xl lg:text-4xl text-[#F4F1EA]/95"
             >
-              نزاهة قانونية.. لحماية تطلعاتك وحفظ حقوقك
+              {t.headline}
             </motion.h1>
 
             <motion.p
@@ -74,7 +98,7 @@ export default function LegalHero() {
               transition={{ duration: 0.8, delay: 0.25 }}
               className="mt-6 max-w-xl text-[#C9D6C2]/85 text-lg md:text-xl leading-loose"
             >
-              نقدم حلولاً واستشارات قانونية متكاملة بمهنية عالية ونزاهة مطلقة للأفراد والشركات.
+              {t.tagline}
             </motion.p>
 
             <motion.div
@@ -88,15 +112,15 @@ export default function LegalHero() {
                 className="inline-flex items-center rounded-full px-9 py-4 font-head font-bold shadow-[0_14px_36px_rgba(212,175,55,0.35)] transition-all hover:-translate-y-0.5 hover:shadow-[0_18px_44px_rgba(212,175,55,0.45)]"
                 style={{ backgroundColor: "#D4AF37", color: "#1C3B28" }}
               >
-                احجز استشارة قانونية
+                {t.ctaPrimary}
               </a>
               <a
-                href={contact.whatsapp}
+                href={activeContact.whatsapp}
                 target="_blank"
                 rel="noreferrer"
                 className="inline-flex items-center gap-2 rounded-full border border-[#F4F1EA]/35 bg-[#F4F1EA]/5 px-9 py-4 font-head font-bold text-[#F4F1EA] backdrop-blur-[8px] transition-all hover:-translate-y-0.5 hover:border-[#D4AF37]/70 hover:bg-[#D4AF37]/10"
               >
-                تواصل معنا مباشرة
+                {t.ctaSecondary}
               </a>
             </motion.div>
           </div>

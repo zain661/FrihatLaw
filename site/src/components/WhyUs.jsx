@@ -1,9 +1,25 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { whyUs } from "../data/home";
+import { whyUsEn } from "../data/home.en";
+import { useLanguage } from "../lib/LanguageContext";
+
+const COPY = {
+  ar: { eyebrow: "لماذا فريحات جروب", title: "ثقة مؤسسية مبنية على أساس قانوني صلب" },
+  en: { eyebrow: "Why Frihat Group", title: "Institutional Trust Built on a Solid Legal Foundation" },
+};
 
 export default function WhyUs() {
   const [active, setActive] = useState(0);
+  const { lang } = useLanguage();
+  const t = COPY[lang];
+  const items = lang === "en" ? whyUsEn : whyUs;
+  // In Arabic, the numbered list is deliberately forced onto the physical
+  // left (dir="ltr" wrapper + dir="rtl" children) — a specific aesthetic
+  // choice. In English that's already the natural LTR order, so no override
+  // is needed; the grid's normal DOM order does it for free.
+  const wrapperDir = lang === "ar" ? "ltr" : undefined;
+  const innerDir = lang === "ar" ? "rtl" : undefined;
 
   return (
     <section className="bg-cream text-ink border-t border-gold/12 py-14 md:py-20 px-6 md:px-10">
@@ -15,22 +31,19 @@ export default function WhyUs() {
           transition={{ duration: 0.5 }}
           className="mb-16 max-w-2xl"
         >
-          <p className="font-head text-base tracking-wide leading-relaxed text-gold font-semibold uppercase mb-5">لماذا فريحات جروب</p>
-          <h2 className="font-head text-3xl md:text-4xl font-extrabold text-green-deep leading-tight">
-            ثقة مؤسسية مبنية على أساس قانوني صلب
-          </h2>
+          <p className="font-head text-base tracking-wide leading-relaxed text-gold font-semibold uppercase mb-5">{t.eyebrow}</p>
+          <h2 className="font-head text-3xl md:text-4xl font-extrabold text-green-deep leading-tight">{t.title}</h2>
         </motion.div>
 
-        <div dir="ltr" className="grid gap-8 lg:grid-cols-12 lg:gap-6 items-stretch">
-          {/* Numbers list — physically on the left */}
-          <div dir="rtl" className="lg:col-span-5">
+        <div dir={wrapperDir} className="grid gap-8 lg:grid-cols-12 lg:gap-6 items-stretch">
+          <div dir={innerDir} className="lg:col-span-5">
             <nav className="flex flex-col">
-              {whyUs.map((w, i) => (
+              {items.map((w, i) => (
                 <button
                   key={w.title}
                   onClick={() => setActive(i)}
                   onMouseEnter={() => setActive(i)}
-                  className="group relative flex w-full items-center gap-5 rounded-2xl px-4 py-5 text-right transition-colors duration-300"
+                  className="group relative flex w-full items-center gap-5 rounded-2xl px-4 py-5 text-start transition-colors duration-300"
                 >
                   {active === i && (
                     <motion.span
@@ -58,8 +71,7 @@ export default function WhyUs() {
             </nav>
           </div>
 
-          {/* Detail card — physically on the right */}
-          <div dir="rtl" className="lg:col-span-7">
+          <div dir={innerDir} className="lg:col-span-7">
             <div className="relative h-full min-h-[280px]">
               <div className="pointer-events-none absolute -inset-8 rounded-[40px] bg-gold/15 blur-[70px]" />
               <AnimatePresence mode="wait">
@@ -74,10 +86,8 @@ export default function WhyUs() {
                   <span className="font-head text-5xl font-black text-gold/20 mb-6 block leading-none">
                     {String(active + 1).padStart(2, "0")}
                   </span>
-                  <h3 className="font-head text-2xl md:text-3xl font-extrabold text-green-deep mb-4">
-                    {whyUs[active].title}
-                  </h3>
-                  <p className="text-ink-muted text-lg leading-relaxed">{whyUs[active].body}</p>
+                  <h3 className="font-head text-2xl md:text-3xl font-extrabold text-green-deep mb-4">{items[active].title}</h3>
+                  <p className="text-ink-muted text-lg leading-relaxed">{items[active].body}</p>
                 </motion.div>
               </AnimatePresence>
             </div>

@@ -1,12 +1,27 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { team } from "../data/team";
+import { teamEn } from "../data/team.en";
+import { useLanguage } from "../lib/LanguageContext";
 
 const ENTITY_BADGES = {
-  legal: { label: "فريحات للمحاماة", emoji: "⚖️", className: "bg-emerald-100 text-emerald-900 border-emerald-300" },
-  ip: { label: "الملكية الفكرية", emoji: "💡", className: "bg-purple-100 text-purple-900 border-purple-300" },
-  nhr: { label: "كيان NHR", emoji: "💻", className: "bg-sky-100 text-sky-900 border-sky-300" },
-  tech: { label: "الأنظمة والتقنية", emoji: "🖥️", className: "bg-amber-100 text-amber-900 border-[#D4AF37]/60" },
+  ar: {
+    legal: { label: "فريحات للمحاماة", emoji: "⚖️", className: "bg-emerald-100 text-emerald-900 border-emerald-300" },
+    ip: { label: "الملكية الفكرية", emoji: "💡", className: "bg-purple-100 text-purple-900 border-purple-300" },
+    nhr: { label: "كيان NHR", emoji: "💻", className: "bg-sky-100 text-sky-900 border-sky-300" },
+    tech: { label: "الأنظمة والتقنية", emoji: "🖥️", className: "bg-amber-100 text-amber-900 border-[#D4AF37]/60" },
+  },
+  en: {
+    legal: { label: "Frihat Legal", emoji: "⚖️", className: "bg-emerald-100 text-emerald-900 border-emerald-300" },
+    ip: { label: "Intellectual Property", emoji: "💡", className: "bg-purple-100 text-purple-900 border-purple-300" },
+    nhr: { label: "Kayan NHR", emoji: "💻", className: "bg-sky-100 text-sky-900 border-sky-300" },
+    tech: { label: "Systems & Technology", emoji: "🖥️", className: "bg-amber-100 text-amber-900 border-[#D4AF37]/60" },
+  },
+};
+
+const COPY = {
+  ar: { leadership: "القيادة المؤسسية", executive: "الإدارة التنفيذية", traineesTitle: "قسم المتدربين القانونيين (Legal Interns)", arrow: "←" },
+  en: { leadership: "Institutional Leadership", executive: "Executive Management", traineesTitle: "Legal Interns Department", arrow: "→" },
 };
 
 const CARD = "rounded-2xl border border-[#D4AF37]/30 bg-white/80 backdrop-blur-md shadow-sm transition-all duration-300 hover:shadow-md";
@@ -33,8 +48,8 @@ function Eyebrow({ children, className = "" }) {
   );
 }
 
-function EntityBadgePill({ type }) {
-  const b = ENTITY_BADGES[type];
+function EntityBadgePill({ type, badges }) {
+  const b = badges[type];
   if (!b) return null;
   return (
     <span className={`inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-xs font-bold ${b.className}`}>
@@ -70,24 +85,24 @@ function PersonAvatar({ name, photo, size = "h-16 w-16", position = "object-cent
   );
 }
 
-function PageHeader() {
+function PageHeader({ t }) {
   return (
     <section className="bg-[#F7F5EE] px-6 pb-6 pt-32 text-center md:pt-40">
       <Reveal>
-        <Eyebrow>{team.hero.eyebrow}</Eyebrow>
-        <h1 className="font-team-head mb-3 text-3xl font-extrabold text-[#1C3B28] md:text-4xl">{team.hero.title}</h1>
-        <p className="font-team-body mx-auto max-w-xl text-[#3D453E]/75">{team.hero.subtitle}</p>
+        <Eyebrow>{t.hero.eyebrow}</Eyebrow>
+        <h1 className="font-team-head mb-3 text-3xl font-extrabold text-[#1C3B28] md:text-4xl">{t.hero.title}</h1>
+        <p className="font-team-body mx-auto max-w-xl text-[#3D453E]/75">{t.hero.subtitle}</p>
       </Reveal>
     </section>
   );
 }
 
-function FounderSection({ founder }) {
+function FounderSection({ founder, leadershipLabel }) {
   return (
     <section className="relative overflow-hidden bg-[#F7F5EE] px-6 py-20 md:py-24">
       <div className="pointer-events-none absolute left-1/2 top-0 h-[520px] w-[520px] -translate-x-1/2 rounded-full bg-[#D4AF37]/8 blur-[140px]" />
       <Reveal className="relative mx-auto max-w-2xl text-center">
-        <Eyebrow>القيادة المؤسسية</Eyebrow>
+        <Eyebrow>{leadershipLabel}</Eyebrow>
         <div className="relative mx-auto mb-8 h-52 w-52 md:h-64 md:w-64">
           <div className="absolute -inset-3 rounded-full bg-gradient-to-br from-[#D4AF37]/45 to-transparent blur-xl" />
           <img
@@ -105,7 +120,7 @@ function FounderSection({ founder }) {
   );
 }
 
-function ExecutiveDirectorSection({ director }) {
+function ExecutiveDirectorSection({ director, executiveLabel }) {
   return (
     <section className="bg-[#F7F5EE] px-6 pb-20 md:pb-24">
       <Reveal className="mx-auto max-w-4xl">
@@ -115,8 +130,8 @@ function ExecutiveDirectorSection({ director }) {
             alt={director.name}
             className="h-40 w-40 shrink-0 rounded-full object-cover ring-2 ring-[#D4AF37] shadow-[0_20px_45px_-15px_rgba(28,59,40,0.4)] md:h-52 md:w-52"
           />
-          <div className="flex-1 text-center md:text-right">
-            <Eyebrow>الإدارة التنفيذية</Eyebrow>
+          <div className="flex-1 text-center md:text-start">
+            <Eyebrow>{executiveLabel}</Eyebrow>
             <h3 className="font-team-head mb-1 text-2xl font-bold text-[#1C3B28]">{director.name}</h3>
             <p className="font-team-body mb-4 font-semibold text-[#D4AF37]">{director.role}</p>
             <p className="font-team-body leading-relaxed text-[#3D453E]/80">{director.bio}</p>
@@ -127,7 +142,7 @@ function ExecutiveDirectorSection({ director }) {
   );
 }
 
-function MemberPanel({ member, delay = 0 }) {
+function MemberPanel({ member, delay = 0, badges }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 16 }}
@@ -141,37 +156,37 @@ function MemberPanel({ member, delay = 0 }) {
       </div>
       <h4 className="font-team-head text-xl font-bold text-[#1C3B28]">{member.name}</h4>
       <p className="font-team-body mb-3 mt-1 text-base text-[#3D453E]/70">{member.role}</p>
-      {member.badge && <EntityBadgePill type={member.badge} />}
+      {member.badge && <EntityBadgePill type={member.badge} badges={badges} />}
     </motion.div>
   );
 }
 
-function TraineesBanner() {
+function TraineesBanner({ subtitle, title, arrow }) {
   return (
     <Reveal delay={0.2} className="mx-auto mt-14 max-w-3xl">
       <Link
         to="/team/trainees"
-        className={`${CARD} group flex flex-col items-center gap-6 p-8 text-center hover:scale-[1.01] hover:border-[#D4AF37]/60 sm:flex-row sm:text-right`}
+        className={`${CARD} group flex flex-col items-center gap-6 p-8 text-center hover:scale-[1.01] hover:border-[#D4AF37]/60 sm:flex-row sm:text-start`}
       >
         <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-[#1C3B28] text-2xl text-[#D4AF37] shadow-[0_10px_25px_-10px_rgba(28,59,40,0.5)] transition-transform duration-300 group-hover:-translate-x-1">
           🎓
         </span>
         <div className="flex-1">
-          <h3 className="font-team-head text-xl font-bold text-[#1C3B28]">قسم المتدربين القانونيين (Legal Interns)</h3>
-          <p className="font-team-body mt-1 text-base text-[#3D453E]/70">{team.trainees.subtitle}</p>
+          <h3 className="font-team-head text-xl font-bold text-[#1C3B28]">{title}</h3>
+          <p className="font-team-body mt-1 text-base text-[#3D453E]/70">{subtitle}</p>
         </div>
         <span
           aria-hidden="true"
           className="font-team-head shrink-0 text-2xl text-[#D4AF37] transition-transform duration-300 group-hover:-translate-x-1"
         >
-          ←
+          {arrow}
         </span>
       </Link>
     </Reveal>
   );
 }
 
-function LegalSection({ section }) {
+function LegalSection({ section, t, copy, badges }) {
   return (
     <section className="bg-[#F7F5EE] px-6 py-20 md:py-24">
       <Reveal className="mx-auto mb-14 max-w-2xl text-center">
@@ -180,15 +195,15 @@ function LegalSection({ section }) {
       </Reveal>
       <div className="mx-auto grid max-w-5xl grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {section.members.map((m, i) => (
-          <MemberPanel key={m.name} member={m} delay={(i % 3) * 0.06} />
+          <MemberPanel key={m.name} member={m} delay={(i % 3) * 0.06} badges={badges} />
         ))}
       </div>
-      <TraineesBanner />
+      <TraineesBanner subtitle={t.trainees.subtitle} title={copy.traineesTitle} arrow={copy.arrow} />
     </section>
   );
 }
 
-function FeaturedMemberSection({ section, tone = "light" }) {
+function FeaturedMemberSection({ section, tone = "light", badges }) {
   return (
     <section className={`px-6 py-20 md:py-24 ${tone === "light" ? "bg-[#F7F5EE]" : "bg-white/50"}`}>
       <Reveal className="mx-auto mb-12 max-w-2xl text-center">
@@ -202,14 +217,14 @@ function FeaturedMemberSection({ section, tone = "light" }) {
           </div>
           <h3 className="font-team-head text-2xl font-bold text-[#1C3B28]">{section.member.name}</h3>
           <p className="font-team-body mb-4 mt-1 text-lg text-[#3D453E]/75">{section.member.role}</p>
-          {section.member.badge && <EntityBadgePill type={section.member.badge} />}
+          {section.member.badge && <EntityBadgePill type={section.member.badge} badges={badges} />}
         </div>
       </Reveal>
     </section>
   );
 }
 
-function HRSection({ section }) {
+function HRSection({ section, badges }) {
   return (
     <section className="bg-[#F7F5EE] px-6 py-20 md:py-24">
       <Reveal className="mx-auto mb-14 max-w-2xl text-center">
@@ -218,7 +233,7 @@ function HRSection({ section }) {
       </Reveal>
       <div className="mx-auto grid max-w-2xl grid-cols-1 gap-6 sm:grid-cols-2">
         {section.members.map((m, i) => (
-          <MemberPanel key={m.name} member={m} delay={i * 0.08} />
+          <MemberPanel key={m.name} member={m} delay={i * 0.08} badges={badges} />
         ))}
       </div>
     </section>
@@ -226,16 +241,21 @@ function HRSection({ section }) {
 }
 
 export default function TeamPage() {
+  const { lang } = useLanguage();
+  const t = lang === "en" ? teamEn : team;
+  const copy = COPY[lang];
+  const badges = ENTITY_BADGES[lang];
+
   return (
     <div className="font-team-body">
-      <PageHeader />
-      <FounderSection founder={team.founder} />
-      <ExecutiveDirectorSection director={team.executiveDirector} />
-      <LegalSection section={team.legalSection} />
-      <FeaturedMemberSection section={team.financeSection} tone="white" />
-      <FeaturedMemberSection section={team.engineeringSection} tone="light" />
-      <HRSection section={team.hrSection} />
-      <FeaturedMemberSection section={team.officeSection} tone="white" />
+      <PageHeader t={t} />
+      <FounderSection founder={t.founder} leadershipLabel={copy.leadership} />
+      <ExecutiveDirectorSection director={t.executiveDirector} executiveLabel={copy.executive} />
+      <LegalSection section={t.legalSection} t={t} copy={copy} badges={badges} />
+      <FeaturedMemberSection section={t.financeSection} tone="white" badges={badges} />
+      <FeaturedMemberSection section={t.engineeringSection} tone="light" badges={badges} />
+      <HRSection section={t.hrSection} badges={badges} />
+      <FeaturedMemberSection section={t.officeSection} tone="white" badges={badges} />
     </div>
   );
 }

@@ -38,7 +38,25 @@
       "Bash(curl -s http://localhost:5173/src/pages/BlogPage.jsx -o /dev/null -w \"BlogPage.jsx transform: HTTP %{http_code}\\\\n\")",
       "Bash(curl -s http://localhost:5173/src/lib/articles.js -o /dev/null -w \"articles.js transform: HTTP %{http_code}\\\\n\")",
       "Bash(node -e \"require\\('./src/data/blog.js'\\)\")",
-      "Bash(node --input-type=module -e \"import\\('./src/data/blog.js'\\).then\\(m => console.log\\('articles:', m.seedArticles.length\\)\\)\")"
+      "Bash(node --input-type=module -e \"import\\('./src/data/blog.js'\\).then\\(m => console.log\\('articles:', m.seedArticles.length\\)\\)\")",
+      "mcp__railway__list-projects",
+      "mcp__railway__list-services",
+      "mcp__railway__list-deployments",
+      "mcp__railway__get-service-config",
+      "mcp__railway__get-logs",
+      "Bash(python3 *)",
+      "Bash(where python *)",
+      "Bash(where python3 *)",
+      "Bash(where py *)",
+      "Bash(python *)",
+      "mcp__railway__list-variables",
+      "mcp__railway__set-variables",
+      "mcp__railway__get-status",
+      "mcp__railway__redeploy",
+      "Bash(git -C \"site\" rev-parse --show-toplevel)",
+      "Bash(git commit *)",
+      "Bash(git push *)",
+      "Bash(npm view *)"
     ]
   }
 }

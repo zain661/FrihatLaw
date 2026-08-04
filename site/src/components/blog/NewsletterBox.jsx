@@ -1,25 +1,30 @@
 import { useState } from "react";
+import { subscribeToNewsletter } from "../../lib/articles";
 
-const KEY = "frihat_newsletter_subscribers";
+const EMAIL_RE = /^\S+@\S+\.\S+$/;
 
 export default function NewsletterBox() {
   const [email, setEmail] = useState("");
-  const [done, setDone] = useState(false);
+  const [status, setStatus] = useState("idle"); // idle | loading | success | error
   const [error, setError] = useState("");
 
-  const submit = (e) => {
+  const submit = async (e) => {
     e.preventDefault();
-    if (!/^\S+@\S+\.\S+$/.test(email)) {
+    if (!EMAIL_RE.test(email.trim())) {
+      setStatus("error");
       setError("يرجى إدخال بريد إلكتروني صحيح.");
       return;
     }
+
+    setStatus("loading");
     setError("");
-    const list = JSON.parse(localStorage.getItem(KEY) || "[]");
-    if (!list.includes(email)) {
-      list.push(email);
-      localStorage.setItem(KEY, JSON.stringify(list));
+    try {
+      await subscribeToNewsletter(email);
+      setStatus("success");
+    } catch (err) {
+      setStatus("error");
+      setError(err.message || "تعذّر إتمام الاشتراك، حاول مرة أخرى.");
     }
-    setDone(true);
   };
 
   return (
@@ -30,9 +35,10 @@ export default function NewsletterBox() {
       <p className="relative text-sm text-cream/70 leading-relaxed mb-5">
         رؤى قانونية وتحديثات موارد بشرية تصلك أولًا بأول، دون إزعاج.
       </p>
-      {done ? (
+
+      {status === "success" ? (
         <p className="relative rounded-xl bg-cream/10 px-4 py-3 text-sm font-semibold text-gold-light">
-          ✓ تم تسجيل اهتمامك بنجاح، شكرًا لانضمامك.
+          شكراً لاشتراكك! 🎉
         </p>
       ) : (
         <form onSubmit={submit} className="relative space-y-2">
@@ -42,16 +48,18 @@ export default function NewsletterBox() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="بريدك الإلكتروني"
-              className="min-w-0 flex-1 rounded-full border border-cream/20 bg-cream/5 px-4 py-3 text-sm text-cream placeholder:text-cream/40 outline-none focus:border-gold-light transition-colors"
+              disabled={status === "loading"}
+              className="min-w-0 flex-1 rounded-full border border-cream/20 bg-cream/5 px-4 py-3 text-sm text-cream placeholder:text-cream/40 outline-none focus:border-gold-light transition-colors disabled:opacity-60"
             />
             <button
               type="submit"
-              className="shrink-0 rounded-full bg-gold-light px-5 py-3 text-sm font-bold text-green-deep hover:bg-gold-pale transition-colors cursor-pointer"
+              disabled={status === "loading"}
+              className="shrink-0 rounded-full bg-gold-light px-5 py-3 text-sm font-bold text-green-deep hover:bg-gold-pale transition-colors cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              اشتراك
+              {status === "loading" ? "جاري الاشتراك..." : "اشتراك"}
             </button>
           </div>
-          {error && <p className="text-xs font-semibold text-red-300">{error}</p>}
+          {status === "error" && error && <p className="text-xs font-semibold text-red-300">{error}</p>}
         </form>
       )}
     </div>

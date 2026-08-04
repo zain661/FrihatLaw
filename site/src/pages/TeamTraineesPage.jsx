@@ -1,8 +1,15 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { team } from "../data/team";
+import { teamEn } from "../data/team.en";
+import { useLanguage } from "../lib/LanguageContext";
 
 const CARD = "rounded-2xl border border-[#D4AF37]/30 bg-white/80 backdrop-blur-md shadow-sm transition-all duration-300 hover:shadow-md";
+
+const COPY = {
+  ar: { back: "العودة إلى فريق العمل", arrow: "→" },
+  en: { back: "Back to Team", arrow: "←" },
+};
 
 function Reveal({ children, delay = 0, className = "" }) {
   return (
@@ -78,7 +85,10 @@ function YearGroup({ year, delay = 0 }) {
 }
 
 export default function TeamTraineesPage() {
-  const { trainees } = team;
+  const { lang } = useLanguage();
+  const t = lang === "en" ? teamEn : team;
+  const copy = COPY[lang];
+  const { trainees } = t;
 
   return (
     <div className="font-team-body bg-[#F7F5EE]">
@@ -88,8 +98,8 @@ export default function TeamTraineesPage() {
             to="/team"
             className="font-team-body mb-6 inline-flex items-center gap-2 text-sm font-bold text-[#1C3B28]/70 transition-colors hover:text-[#D4AF37]"
           >
-            <span aria-hidden="true">→</span>
-            العودة إلى فريق العمل
+            <span aria-hidden="true">{copy.arrow}</span>
+            {copy.back}
           </Link>
           <Eyebrow>{trainees.eyebrow}</Eyebrow>
           <h1 className="font-team-head mb-3 text-3xl font-extrabold text-[#1C3B28] md:text-4xl">{trainees.title}</h1>

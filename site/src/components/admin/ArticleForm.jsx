@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CATEGORIES } from "../../data/blog";
+import { uploadArticleImage } from "../../lib/articles";
 
 export default function ArticleForm({ initial, submitLabel, onSubmit, submitting = false }) {
   const [title, setTitle] = useState(initial?.title || "");
@@ -7,35 +8,65 @@ export default function ArticleForm({ initial, submitLabel, onSubmit, submitting
   const [authorTitle, setAuthorTitle] = useState(initial?.authorTitle || "");
   const [category, setCategory] = useState(initial?.category || CATEGORIES[0].key);
   const [content, setContent] = useState(initial?.content || "");
-  const [imageData, setImageData] = useState(initial?.image || "");
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(initial?.image || "");
   const [imageName, setImageName] = useState(initial?.image ? "الصورة الحالية" : "");
+  const [uploading, setUploading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
+
+  // Release the local preview URL once it's no longer shown, so selecting a
+  // few images in a row doesn't leak blob: URLs for the lifetime of the tab.
+  useEffect(() => {
+    return () => {
+      if (imagePreview?.startsWith("blob:")) URL.revokeObjectURL(imagePreview);
+    };
+  }, [imagePreview]);
 
   const onImageChange = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
     setImageName(file.name);
-    const reader = new FileReader();
-    reader.onload = () => setImageData(reader.result);
-    reader.readAsDataURL(file);
+    setImageFile(file);
+    setImagePreview((prev) => {
+      if (prev?.startsWith("blob:")) URL.revokeObjectURL(prev);
+      return URL.createObjectURL(file);
+    });
   };
 
-  const submit = (e) => {
+  const submit = async (e) => {
     e.preventDefault();
     setErrorMsg("");
     if (!title.trim() || !authorName.trim() || !content.trim()) {
       setErrorMsg("يرجى تعبئة عنوان المقال، اسم الكاتب، ومحتوى المقال قبل النشر.");
       return;
     }
+
+    // Only touches Storage when a new file was picked — editing an article
+    // without changing its cover just keeps the existing public URL as-is.
+    let image = initial?.image || "";
+    if (imageFile) {
+      setUploading(true);
+      try {
+        image = await uploadArticleImage(imageFile);
+      } catch (err) {
+        setErrorMsg(err.message || "تعذّر رفع الصورة، حاول مرة أخرى.");
+        setUploading(false);
+        return;
+      }
+      setUploading(false);
+    }
+
     onSubmit({
       title: title.trim(),
       authorName: authorName.trim(),
       authorTitle: authorTitle.trim(),
       category,
       content: content.trim(),
-      image: imageData || "/brand/logo-group.png",
+      image: image || "/brand/logo-group.png",
     });
   };
+
+  const busy = submitting || uploading;
 
   return (
     <form onSubmit={submit} className="rounded-3xl bg-paper border border-green/10 shadow-[0_20px_50px_-25px_rgba(15,43,34,0.3)] p-6 md:p-8 space-y-6">
@@ -91,13 +122,15 @@ export default function ArticleForm({ initial, submitLabel, onSubmit, submitting
       <div>
         <label className="block text-sm font-bold text-ink mb-2">صورة الغلاف</label>
         <label className="flex items-center gap-4 rounded-xl border border-dashed border-green/30 px-4 py-3.5 cursor-pointer hover:border-gold transition-colors">
-          {imageData ? (
-            <img src={imageData} alt="" className="h-14 w-14 rounded-lg object-cover shrink-0" />
+          {imagePreview ? (
+            <img src={imagePreview} alt="" className="h-14 w-14 rounded-lg object-cover shrink-0" />
           ) : (
             <span className="flex h-14 w-14 items-center justify-center rounded-lg bg-green/10 text-xl shrink-0">🖼️</span>
           )}
-          <span className="text-sm text-ink-muted truncate">{imageName || "اضغط لاختيار صورة من جهازك"}</span>
-          <input type="file" accept="image/*" onChange={onImageChange} className="hidden" />
+          <span className="text-sm text-ink-muted truncate">
+            {uploading ? "جارٍ رفع الصورة..." : imageName || "اضغط لاختيار صورة من جهازك"}
+          </span>
+          <input type="file" accept="image/*" onChange={onImageChange} disabled={uploading} className="hidden" />
         </label>
       </div>
 
@@ -116,10 +149,10 @@ export default function ArticleForm({ initial, submitLabel, onSubmit, submitting
 
       <button
         type="submit"
-        disabled={submitting}
+        disabled={busy}
         className="w-full rounded-xl bg-gold-light py-4 font-head font-bold text-green-deep shadow-[0_15px_35px_-10px_rgba(231,184,77,0.5)] hover:bg-gold-pale transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
       >
-        {submitLabel}
+        {uploading ? "جارٍ رفع الصورة..." : submitLabel}
       </button>
     </form>
   );

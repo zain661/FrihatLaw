@@ -2,9 +2,10 @@ import { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { nav } from "../data/shared";
+import { navEn } from "../data/shared.en";
+import { useLanguage } from "../lib/LanguageContext";
 
 const COMPANY_PATHS = ["/frihat-legal", "/frihat-ip", "/kayan-nhr"];
-const companyItems = nav.filter((item) => COMPANY_PATHS.includes(item.to));
 
 function ChevronDown({ className = "h-4 w-4" }) {
   return (
@@ -14,7 +15,25 @@ function ChevronDown({ className = "h-4 w-4" }) {
   );
 }
 
-function CompaniesDropdown({ dark, active, currentUrl }) {
+function LanguageToggle({ dark }) {
+  const { lang, toggle } = useLanguage();
+  return (
+    <button
+      type="button"
+      onClick={toggle}
+      className={`flex items-center justify-center rounded-full border px-3 py-1.5 text-xs font-bold transition-colors ${
+        dark
+          ? "border-[#354D40]/25 text-[#354D40]/80 hover:border-[#D4AF37] hover:text-[#D4AF37]"
+          : "border-cream/30 text-cream/90 hover:border-gold-light hover:text-gold-light"
+      }`}
+      aria-label={lang === "ar" ? "Switch to English" : "التبديل إلى العربية"}
+    >
+      {lang === "ar" ? "EN" : "AR"}
+    </button>
+  );
+}
+
+function CompaniesDropdown({ dark, active, currentUrl, companyItems, label }) {
   const [open, setOpen] = useState(false);
   const closeTimer = useRef(null);
 
@@ -34,7 +53,7 @@ function CompaniesDropdown({ dark, active, currentUrl }) {
         type="button"
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
-        className={`relative flex w-fit items-center gap-1.5 py-1 transition-colors after:absolute after:-bottom-0.5 after:right-0 after:h-px after:bg-current after:transition-all after:duration-300 ${
+        className={`relative flex w-fit items-center gap-1.5 py-1 transition-colors after:absolute after:-bottom-0.5 after:start-0 after:h-px after:bg-current after:transition-all after:duration-300 ${
           dark
             ? active
               ? "text-[#D4AF37] font-bold border-b-2 border-[#D4AF37] after:w-0"
@@ -44,7 +63,7 @@ function CompaniesDropdown({ dark, active, currentUrl }) {
               : "text-cream/90 hover:text-gold-light after:w-0 hover:after:w-full"
         }`}
       >
-        شركات المجموعة
+        {label}
         <ChevronDown className={`h-4 w-4 transition-transform duration-300 ${open ? "rotate-180" : ""}`} />
       </button>
 
@@ -55,7 +74,7 @@ function CompaniesDropdown({ dark, active, currentUrl }) {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 8 }}
             transition={{ duration: 0.18, ease: "easeOut" }}
-            className="absolute right-0 top-full z-[110] mt-3 w-72 rounded-xl border border-white/10 bg-black/80 p-2 shadow-[0_25px_60px_-20px_rgba(0,0,0,0.6)] backdrop-blur-md"
+            className="absolute start-0 top-full z-[110] mt-3 w-72 rounded-xl border border-white/10 bg-black/80 p-2 shadow-[0_25px_60px_-20px_rgba(0,0,0,0.6)] backdrop-blur-md"
           >
             {companyItems.map((item) => {
               const isActive = currentUrl === item.to || currentUrl.startsWith(item.to);
@@ -79,7 +98,7 @@ function CompaniesDropdown({ dark, active, currentUrl }) {
   );
 }
 
-function MobileCompaniesAccordion({ currentUrl, onNavigate }) {
+function MobileCompaniesAccordion({ currentUrl, onNavigate, companyItems, label }) {
   const [open, setOpen] = useState(false);
   const isActive = companyItems.some((item) => currentUrl === item.to || currentUrl.startsWith(item.to));
 
@@ -93,7 +112,7 @@ function MobileCompaniesAccordion({ currentUrl, onNavigate }) {
           isActive ? "text-green bg-green/8" : "text-ink hover:bg-green/5"
         }`}
       >
-        شركات المجموعة
+        {label}
         <ChevronDown className={`h-4 w-4 transition-transform duration-300 ${open ? "rotate-180" : ""}`} />
       </button>
       <AnimatePresence>
@@ -103,7 +122,7 @@ function MobileCompaniesAccordion({ currentUrl, onNavigate }) {
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.2, ease: "easeOut" }}
-            className="overflow-hidden pr-3"
+            className="overflow-hidden ps-3"
           >
             {companyItems.map((item) => {
               const active = currentUrl === item.to || currentUrl.startsWith(item.to);
@@ -131,9 +150,17 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const location = useLocation();
+  const { lang } = useLanguage();
   const currentUrl = location.pathname + location.hash;
   const forceDark = location.pathname === "/frihat-ip" || location.pathname.startsWith("/team");
   const dark = scrolled || forceDark;
+
+  const activeNav = lang === "en" ? navEn : nav;
+  const companiesLabel = lang === "en" ? "Group Companies" : "شركات المجموعة";
+  const contactLabel = lang === "en" ? "Contact Us" : "تواصل معنا";
+  const menuLabel = lang === "en" ? "Menu" : "القائمة";
+
+  const companyItems = activeNav.filter((item) => COMPANY_PATHS.includes(item.to));
   const companiesActive = COMPANY_PATHS.some((p) => location.pathname === p || location.pathname.startsWith(p));
 
   useEffect(() => {
@@ -143,7 +170,7 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const mainItems = nav.slice(1).filter((item) => !COMPANY_PATHS.includes(item.to));
+  const mainItems = activeNav.slice(1).filter((item) => !COMPANY_PATHS.includes(item.to));
   const aboutItem = mainItems.find((item) => item.to === "/#about");
   const restItems = mainItems.filter((item) => item.to !== "/#about");
 
@@ -162,7 +189,7 @@ export default function Navbar() {
           </span>
           <span className="flex flex-col leading-tight font-head">
             <strong className={`text-base font-extrabold transition-colors ${dark ? "text-green-deep" : "text-cream"}`}>
-              فريحات
+              {lang === "en" ? "Frihat" : "فريحات"}
             </strong>
             <em className={`not-italic text-[0.62rem] tracking-[0.3em] font-bold transition-colors ${dark ? "text-[#354D40]" : "text-gold-light"}`}>
               GROUP
@@ -178,7 +205,7 @@ export default function Navbar() {
           {aboutItem && (
             <Link
               to={aboutItem.to}
-              className={`relative w-fit py-1 transition-colors after:absolute after:-bottom-0.5 after:right-0 after:h-px after:bg-current after:transition-all after:duration-300 ${
+              className={`relative w-fit py-1 transition-colors after:absolute after:-bottom-0.5 after:start-0 after:h-px after:bg-current after:transition-all after:duration-300 ${
                 dark
                   ? currentUrl === aboutItem.to
                     ? "text-[#D4AF37] font-bold border-b-2 border-[#D4AF37] after:w-0"
@@ -192,7 +219,7 @@ export default function Navbar() {
             </Link>
           )}
 
-          <CompaniesDropdown dark={dark} active={companiesActive} currentUrl={location.pathname} />
+          <CompaniesDropdown dark={dark} active={companiesActive} currentUrl={location.pathname} companyItems={companyItems} label={companiesLabel} />
 
           {restItems.map((item) => {
             const active = item.to.includes("#") ? currentUrl === item.to : location.pathname === item.to;
@@ -200,7 +227,7 @@ export default function Navbar() {
               <Link
                 key={item.to}
                 to={item.to}
-                className={`relative w-fit py-1 transition-colors after:absolute after:-bottom-0.5 after:right-0 after:h-px after:bg-current after:transition-all after:duration-300 ${
+                className={`relative w-fit py-1 transition-colors after:absolute after:-bottom-0.5 after:start-0 after:h-px after:bg-current after:transition-all after:duration-300 ${
                   dark
                     ? active
                       ? "text-[#D4AF37] font-bold border-b-2 border-[#D4AF37] after:w-0"
@@ -216,22 +243,24 @@ export default function Navbar() {
           })}
         </nav>
 
-        <Link
-          to="/#contact"
-          className="hidden md:inline-flex items-center rounded-full bg-[#D4AF37] px-6 py-2.5 text-sm font-bold text-green-deep shadow-[0_8px_24px_rgba(212,175,55,0.4)] hover:bg-[#c19d2e] transition-colors font-head"
-        >
-          تواصل معنا
-        </Link>
+        <div className="hidden md:flex items-center gap-3">
+          <LanguageToggle dark={dark} />
+          <Link
+            to="/#contact"
+            className="inline-flex items-center rounded-full bg-[#D4AF37] px-6 py-2.5 text-sm font-bold text-green-deep shadow-[0_8px_24px_rgba(212,175,55,0.4)] hover:bg-[#c19d2e] transition-colors font-head"
+          >
+            {contactLabel}
+          </Link>
+        </div>
 
-        <button
-          onClick={() => setOpen((v) => !v)}
-          className="lg:hidden flex flex-col gap-1.5 p-2"
-          aria-label="القائمة"
-        >
-          <span className={`w-6 h-0.5 rounded-full transition-colors ${dark ? "bg-green-deep" : "bg-cream"}`} />
-          <span className={`w-6 h-0.5 rounded-full transition-colors ${dark ? "bg-green-deep" : "bg-cream"}`} />
-          <span className={`w-6 h-0.5 rounded-full transition-colors ${dark ? "bg-green-deep" : "bg-cream"}`} />
-        </button>
+        <div className="flex items-center gap-2 md:hidden">
+          <LanguageToggle dark={dark} />
+          <button onClick={() => setOpen((v) => !v)} className="flex flex-col gap-1.5 p-2" aria-label={menuLabel}>
+            <span className={`w-6 h-0.5 rounded-full transition-colors ${dark ? "bg-green-deep" : "bg-cream"}`} />
+            <span className={`w-6 h-0.5 rounded-full transition-colors ${dark ? "bg-green-deep" : "bg-cream"}`} />
+            <span className={`w-6 h-0.5 rounded-full transition-colors ${dark ? "bg-green-deep" : "bg-cream"}`} />
+          </button>
+        </div>
       </div>
 
       <AnimatePresence>
@@ -254,7 +283,12 @@ export default function Navbar() {
               </Link>
             )}
 
-            <MobileCompaniesAccordion currentUrl={location.pathname} onNavigate={() => setOpen(false)} />
+            <MobileCompaniesAccordion
+              currentUrl={location.pathname}
+              onNavigate={() => setOpen(false)}
+              companyItems={companyItems}
+              label={companiesLabel}
+            />
 
             {restItems.map((item) => {
               const active = item.to.includes("#") ? currentUrl === item.to : location.pathname === item.to;
@@ -276,7 +310,7 @@ export default function Navbar() {
               onClick={() => setOpen(false)}
               className="mt-2 inline-flex items-center justify-center rounded-2xl bg-[#D4AF37] px-4 py-3.5 font-head font-bold text-green-deep hover:bg-[#c19d2e] transition-colors"
             >
-              تواصل معنا
+              {contactLabel}
             </Link>
           </motion.div>
         )}

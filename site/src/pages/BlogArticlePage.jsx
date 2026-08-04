@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { getCategory } from "../data/blog";
-import { getAllArticles, getArticleById } from "../lib/articles";
+import { getAllArticles, getArticleById, incrementArticleViews } from "../lib/articles";
 import PageCTA from "../components/PageCTA";
 
 function formatDate(iso) {
@@ -33,6 +33,15 @@ export default function BlogArticlePage() {
       cancelled = true;
     };
   }, [id]);
+
+  useEffect(() => {
+    if (!article) return;
+    const key = `viewed_${id}`;
+    if (!sessionStorage.getItem(key)) {
+      incrementArticleViews(id);
+      sessionStorage.setItem(key, "true");
+    }
+  }, [article, id]);
 
   if (loading) {
     return <div className="bg-cream min-h-[60vh] pt-32" />;

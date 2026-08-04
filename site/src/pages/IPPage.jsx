@@ -1,19 +1,21 @@
 import { motion, useReducedMotion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { ip } from "../data/ip";
+import { ipEn } from "../data/ip.en";
+import { useLanguage } from "../lib/LanguageContext";
 import PageCTA from "../components/PageCTA";
 
-const collageItems = [
+const collageItemsBase = [
   {
     src: "/brand/ip-collage-patents.png",
-    label: "حماية البراءات",
+    labelKey: "patents",
     className: "col-span-1 row-span-4",
     floatDuration: 7,
     floatDelay: 0,
   },
   {
     src: "/brand/ip-collage-trademarks.png",
-    label: "العلامات التجارية",
+    labelKey: "trademarks",
     icon: "®",
     className: "col-span-2 row-span-2",
     floatDuration: 6,
@@ -21,7 +23,7 @@ const collageItems = [
   },
   {
     src: "/brand/ip-collage-copyright.png",
-    label: "حقوق النشر",
+    labelKey: "copyright",
     icon: "©",
     className: "col-span-1 row-span-2",
     floatDuration: 8,
@@ -29,12 +31,43 @@ const collageItems = [
   },
   {
     src: "/brand/ip-collage-innovation.png",
-    label: "الابتكار الصناعي",
+    labelKey: "designs",
     className: "col-span-1 row-span-2",
     floatDuration: 6.5,
     floatDelay: 0.9,
   },
 ];
+
+const COPY = {
+  ar: {
+    ctaRequest: "طلب استشارة",
+    exploreServices: "تعرف على خدماتنا",
+    coverageLabel: "التغطية الإقليمية المباشرة:",
+    aboutHeading: "خبرة قانونية متخصصة عابرة للحدود",
+    visionMissionTitle: "رؤيتنا ورسالتنا",
+    visionLabel: "رؤيتنا",
+    missionLabel: "رسالتنا",
+    more: "المزيد",
+    arrowIcon: "arrow_back",
+    ctaTitle: "ابدأ اليوم أولى خطوات حماية ملكيتك الفكرية",
+    ctaButton: "حجز استشارة",
+    collageLabels: { patents: "حماية البراءات", trademarks: "العلامات التجارية", copyright: "حقوق النشر", designs: "الرسوم الصناعية" },
+  },
+  en: {
+    ctaRequest: "Request a Consultation",
+    exploreServices: "Explore Our Services",
+    coverageLabel: "Direct Regional Coverage:",
+    aboutHeading: "Specialized Legal Expertise Across Borders",
+    visionMissionTitle: "Our Vision & Mission",
+    visionLabel: "Our Vision",
+    missionLabel: "Our Mission",
+    more: "More",
+    arrowIcon: "arrow_forward",
+    ctaTitle: "Take the first step to protect your intellectual property today",
+    ctaButton: "Book a Consultation",
+    collageLabels: { patents: "Patent Protection", trademarks: "Trademarks", copyright: "Copyright", designs: "Industrial Designs" },
+  },
+};
 
 function CollageTile({ src, label, icon, className, floatDuration, floatDelay }) {
   const reduceMotion = useReducedMotion();
@@ -51,7 +84,7 @@ function CollageTile({ src, label, icon, className, floatDuration, floatDelay })
       />
 
       {icon && (
-        <span className="absolute top-3 right-3 flex h-8 w-8 items-center justify-center rounded-full border border-[#D4AF37]/40 bg-white/90 backdrop-blur-sm font-head text-sm font-bold text-[#D4AF37] shadow-sm">
+        <span className="absolute top-3 end-3 flex h-8 w-8 items-center justify-center rounded-full border border-[#D4AF37]/40 bg-white/90 backdrop-blur-sm font-head text-sm font-bold text-[#D4AF37] shadow-sm">
           {icon}
         </span>
       )}
@@ -65,11 +98,11 @@ function CollageTile({ src, label, icon, className, floatDuration, floatDelay })
   );
 }
 
-function IPCollageGrid() {
+function IPCollageGrid({ labels }) {
   return (
     <div className="grid grid-cols-3 grid-rows-4 gap-4 h-[420px] sm:h-[480px] lg:h-[560px]">
-      {collageItems.map((item) => (
-        <CollageTile key={item.src} {...item} />
+      {collageItemsBase.map((item) => (
+        <CollageTile key={item.src} {...item} label={labels[item.labelKey]} />
       ))}
     </div>
   );
@@ -103,34 +136,40 @@ const driftMotion = [
 
 export default function IPPage() {
   const reduceMotion = useReducedMotion();
+  const { lang } = useLanguage();
+  const t = lang === "en" ? ipEn : ip;
+  const copy = COPY[lang];
+  // In Arabic, the structural wrapper is forced dir="ltr" so "grid on the
+  // physical left, content on the physical right" holds regardless of the
+  // page's RTL flow. In English that's already the natural order.
+  const wrapperDir = lang === "ar" ? "ltr" : undefined;
+  const contentDir = lang === "ar" ? "rtl" : undefined;
 
   return (
     <div className="bg-[#F7F5EE]">
       {/* Hero — Light */}
       <section className="relative overflow-hidden bg-[#F7F5EE] pt-28 pb-20 md:pt-36 md:pb-28">
-        <div className="pointer-events-none absolute -top-32 -left-32 h-[420px] w-[420px] rounded-full bg-[#D4AF37]/10 blur-[130px]" />
-        <div className="pointer-events-none absolute -bottom-24 -right-24 h-[380px] w-[380px] rounded-full bg-[#D4AF37]/10 blur-[120px]" />
+        <div className="pointer-events-none absolute -top-32 -start-32 h-[420px] w-[420px] rounded-full bg-[#D4AF37]/10 blur-[130px]" />
+        <div className="pointer-events-none absolute -bottom-24 -end-24 h-[380px] w-[380px] rounded-full bg-[#D4AF37]/10 blur-[120px]" />
 
         <div className="relative z-10 mx-auto max-w-[1320px] px-5 md:px-16">
-          {/* Structural wrapper kept LTR so "grid-left, content-right" holds
-              regardless of the page's RTL direction; text inside resets to rtl. */}
-          <div dir="ltr" className="grid gap-14 lg:grid-cols-2 lg:gap-16 items-center">
+          <div dir={wrapperDir} className="grid gap-14 lg:grid-cols-2 lg:gap-16 items-center">
             <motion.div
               initial={{ opacity: 0, x: -24 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
             >
-              <IPCollageGrid />
+              <IPCollageGrid labels={copy.collageLabels} />
             </motion.div>
 
-            <div dir="rtl" className="text-right">
+            <div dir={contentDir} className="text-start">
               <motion.h1
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
                 className="font-head text-[36px] md:text-[48px] leading-[1.3] tracking-[-0.02em] font-bold text-[#354D40] mb-4"
               >
-                {ip.heroHeadline}
+                {t.heroHeadline}
               </motion.h1>
 
               <motion.p
@@ -139,7 +178,7 @@ export default function IPPage() {
                 transition={{ duration: 0.6, delay: 0.25, ease: [0.22, 1, 0.36, 1] }}
                 className="font-body text-[20px] md:text-[22px] font-semibold text-[#9A7B2F] mb-5"
               >
-                {ip.heroBrand}
+                {t.heroBrand}
               </motion.p>
 
               <motion.p
@@ -148,7 +187,7 @@ export default function IPPage() {
                 transition={{ duration: 0.6, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
                 className="font-body text-[17px] md:text-[18px] leading-[1.7] text-[#2C3E30]"
               >
-                {ip.heroTagline}
+                {t.heroTagline}
               </motion.p>
 
               <motion.div
@@ -162,13 +201,13 @@ export default function IPPage() {
                   className="h-12 w-full sm:w-auto bg-gradient-to-r from-[#D4AF37] via-[#C5A059] to-[#996515] text-slate-950 px-8 rounded-lg font-body font-bold text-sm flex items-center justify-center gap-2 hover:shadow-[0_0_20px_rgba(212,175,55,0.4)] active:scale-95 transition-all"
                 >
                   <span className="material-symbols-outlined text-lg">gavel</span>
-                  طلب استشارة
+                  {copy.ctaRequest}
                 </Link>
                 <a
                   href="#services"
                   className="h-12 w-full sm:w-auto border border-[#D4AF37]/40 text-[#354D40] px-8 rounded-lg font-body font-semibold text-sm flex items-center justify-center hover:bg-[#D4AF37]/10 transition-colors"
                 >
-                  تعرف على خدماتنا
+                  {copy.exploreServices}
                 </a>
               </motion.div>
             </div>
@@ -176,7 +215,7 @@ export default function IPPage() {
         </div>
       </section>
 
-      {/* About (النبذة) — Dark */}
+      {/* About — Dark */}
       <section id="about" className="scroll-mt-24 py-24 md:py-32 bg-[#354D40]">
         <div className="max-w-[1280px] mx-auto px-5 md:px-16 grid md:grid-cols-2 gap-16 items-center">
           <motion.div
@@ -184,7 +223,7 @@ export default function IPPage() {
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true, margin: "-80px" }}
             transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-            className="relative flex items-center justify-center lg:pl-10"
+            className="relative flex items-center justify-center lg:pe-10"
           >
             <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
               <div className="w-80 h-80 rounded-full bg-gradient-to-tr from-[#D4AF37]/20 via-white/5 to-transparent blur-3xl" />
@@ -196,7 +235,7 @@ export default function IPPage() {
               whileHover={{ scale: 1.03 }}
               className="relative w-full max-w-sm aspect-square backdrop-blur-xl bg-white/95 border border-[#D4AF37]/40 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.35)] rounded-3xl p-6 flex items-center justify-center mx-auto transition-[border-color,box-shadow] duration-300 hover:border-[#D4AF37]/70 hover:shadow-[0_35px_75px_-20px_rgba(212,175,55,0.45)]"
             >
-              <img src={ip.logo} alt={ip.name} className="w-full h-full object-contain drop-shadow-sm" />
+              <img src={t.logo} alt={t.name} className="w-full h-full object-contain drop-shadow-sm" />
             </motion.div>
           </motion.div>
 
@@ -207,21 +246,21 @@ export default function IPPage() {
             transition={{ duration: 0.7, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
           >
             <span className="text-[#D4AF37] font-body text-sm md:text-base font-semibold tracking-widest leading-relaxed uppercase mb-4 block">
-              {ip.intro.title}
+              {t.intro.title}
             </span>
             <h2 className="font-head text-[32px] font-bold text-[#F7F5EE] mb-8 leading-snug">
-              خبرة قانونية متخصصة عابرة للحدود
+              {copy.aboutHeading}
             </h2>
             <div className="space-y-6">
-              {ip.intro.paragraphs.map((p) => (
+              {t.intro.paragraphs.map((p) => (
                 <p key={p} className="font-body text-base leading-[1.8] text-[#F7F5EE]/85">
                   {p}
                 </p>
               ))}
               <div className="pt-2">
-                <p className="font-body text-[#F7F5EE]/60 text-sm font-semibold mb-4">التغطية الإقليمية المباشرة:</p>
+                <p className="font-body text-[#F7F5EE]/60 text-sm font-semibold mb-4">{copy.coverageLabel}</p>
                 <div className="flex flex-wrap gap-3">
-                  {ip.presenceBadges.map((b) => (
+                  {t.presenceBadges.map((b) => (
                     <span
                       key={b.label}
                       className="inline-flex items-center gap-1.5 bg-white/5 border border-[#D4AF37]/50 text-[#F7F5EE] rounded-full px-4 py-2 text-sm font-semibold transition-all duration-300 hover:bg-[#D4AF37]/15 hover:scale-105"
@@ -249,25 +288,25 @@ export default function IPPage() {
           <rect width="100%" height="100%" fill="url(#whyMattersMesh)" />
         </svg>
 
-        <div className="pointer-events-none absolute -top-24 -left-24 h-96 w-96 rounded-full bg-[#D4AF37]/15 blur-[120px]" />
-        <div className="pointer-events-none absolute -bottom-24 -right-24 h-96 w-96 rounded-full bg-[#354D40]/10 blur-[120px]" />
+        <div className="pointer-events-none absolute -top-24 -start-24 h-96 w-96 rounded-full bg-[#D4AF37]/15 blur-[120px]" />
+        <div className="pointer-events-none absolute -bottom-24 -end-24 h-96 w-96 rounded-full bg-[#354D40]/10 blur-[120px]" />
 
         <div className="relative max-w-[1280px] mx-auto px-5 md:px-16">
           <Reveal className="text-center max-w-2xl mx-auto mb-16">
             <span className="inline-flex items-center rounded-full bg-[#D4AF37]/10 backdrop-blur-md border border-[#D4AF37]/40 text-[#9A7B2F] text-sm font-semibold tracking-wider px-4 py-1.5 mb-6 shadow-[0_0_20px_rgba(212,175,55,0.15)]">
-              {ip.whyItMatters.badge}
+              {t.whyItMatters.badge}
             </span>
             <h2 className="font-head text-[36px] md:text-[40px] font-bold text-[#354D40] mb-5 leading-tight">
-              {ip.whyItMatters.title}
+              {t.whyItMatters.title}
             </h2>
-            <p className="font-body text-base leading-[1.8] text-[#2C3E30]">{ip.whyItMatters.subtitle}</p>
+            <p className="font-body text-base leading-[1.8] text-[#2C3E30]">{t.whyItMatters.subtitle}</p>
           </Reveal>
 
           <div className="relative">
-            <div className="pointer-events-none absolute top-6 bottom-6 right-16 w-px bg-gradient-to-b from-[#D4AF37]/60 via-[#354D40]/30 to-transparent lg:hidden" />
+            <div className="pointer-events-none absolute top-6 bottom-6 end-16 w-px bg-gradient-to-b from-[#D4AF37]/60 via-[#354D40]/30 to-transparent lg:hidden" />
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
-              {ip.whyItMatters.points.map((point, i) => (
+              {t.whyItMatters.points.map((point, i) => (
                 <motion.div
                   key={point.title}
                   initial={{ opacity: 0, y: 30 }}
@@ -282,7 +321,7 @@ export default function IPPage() {
                     i === 1 ? "lg:-mt-8" : "lg:mt-8"
                   }`}
                 >
-                  <span className="absolute top-6 left-8 font-head text-5xl font-black bg-gradient-to-br from-[#D4AF37] via-[#9A7B2F] to-[#5c4a1a] bg-clip-text text-transparent opacity-25 select-none">
+                  <span className="absolute top-6 start-8 font-head text-5xl font-black bg-gradient-to-br from-[#D4AF37] via-[#9A7B2F] to-[#5c4a1a] bg-clip-text text-transparent opacity-25 select-none">
                     0{i + 1}
                   </span>
 
@@ -298,7 +337,7 @@ export default function IPPage() {
                     className="relative z-10 flex h-16 w-16 items-center justify-center rounded-full mb-6 shadow-[0_12px_24px_-8px_rgba(0,0,0,0.6)] ring-1 ring-[#f3d98a]/40"
                     style={{ background: sphereGradient }}
                   >
-                    <span className="pointer-events-none absolute top-2 left-3 h-3.5 w-6 rounded-full bg-white/40 blur-[5px]" />
+                    <span className="pointer-events-none absolute top-2 start-3 h-3.5 w-6 rounded-full bg-white/40 blur-[5px]" />
                     <span className="material-symbols-outlined relative text-3xl text-[#fbe9b8] drop-shadow-[0_0_8px_rgba(212,175,55,0.85)]">
                       {point.icon}
                     </span>
@@ -319,20 +358,20 @@ export default function IPPage() {
       <section className="py-24 md:py-32 bg-[#354D40]">
         <div className="max-w-[1280px] mx-auto px-5 md:px-16">
           <Reveal className="text-center mb-16">
-            <h2 className="font-head text-[32px] md:text-[48px] font-semibold text-[#F7F5EE]">رؤيتنا ورسالتنا</h2>
+            <h2 className="font-head text-[32px] md:text-[48px] font-semibold text-[#F7F5EE]">{copy.visionMissionTitle}</h2>
             <div className="w-24 h-1 bg-[#D4AF37] mx-auto mt-4" />
           </Reveal>
           <div className="grid md:grid-cols-2 gap-8 md:gap-12">
             {[
-              { icon: "visibility", title: "رؤيتنا", body: ip.vision },
-              { icon: "flag", title: "رسالتنا", body: ip.mission },
+              { icon: "visibility", title: copy.visionLabel, body: t.vision },
+              { icon: "flag", title: copy.missionLabel, body: t.mission },
             ].map((v, i) => (
               <Reveal
                 key={v.title}
                 delay={i * 0.1}
                 className="group relative p-8 md:p-12 bg-white rounded-xl shadow-[0_20px_50px_-20px_rgba(0,0,0,0.35)] border border-[#D4AF37]/30 hover:border-[#D4AF37]/60 hover:shadow-[0_30px_65px_-15px_rgba(0,0,0,0.4)] transition-all duration-500 overflow-hidden"
               >
-                <div className="absolute top-0 left-0 w-2 h-full bg-[#D4AF37] -translate-x-full group-hover:translate-x-0 transition-transform duration-500" />
+                <div className="absolute top-0 start-0 w-2 h-full bg-[#D4AF37] -translate-x-full group-hover:translate-x-0 transition-transform duration-500" />
                 <div className="w-20 h-20 bg-[#D4AF37]/10 rounded-full flex items-center justify-center mb-8 text-[#D4AF37] group-hover:bg-[#D4AF37] group-hover:text-[#354D40] transition-colors duration-500">
                   <span className="material-symbols-outlined text-4xl">{v.icon}</span>
                 </div>
@@ -355,12 +394,12 @@ export default function IPPage() {
           <rect width="100%" height="100%" fill="url(#oliveLattice)" />
         </svg>
 
-        <div className="pointer-events-none absolute -top-32 -left-20 h-[420px] w-[420px] rounded-full bg-[#354D40]/15 blur-[130px]" />
-        <div className="pointer-events-none absolute -bottom-28 -right-20 h-[380px] w-[380px] rounded-full bg-[#D4AF37]/10 blur-[120px]" />
+        <div className="pointer-events-none absolute -top-32 -start-20 h-[420px] w-[420px] rounded-full bg-[#354D40]/15 blur-[130px]" />
+        <div className="pointer-events-none absolute -bottom-28 -end-20 h-[380px] w-[380px] rounded-full bg-[#D4AF37]/10 blur-[120px]" />
 
         <div className="relative max-w-[1280px] mx-auto px-5 md:px-16">
           <Reveal className="text-center max-w-2xl mx-auto mb-24">
-            <h2 className="font-head text-[36px] md:text-[44px] font-bold text-[#354D40]">{ip.goals.title}</h2>
+            <h2 className="font-head text-[36px] md:text-[44px] font-bold text-[#354D40]">{t.goals.title}</h2>
           </Reveal>
 
           <div className="relative">
@@ -391,10 +430,10 @@ export default function IPPage() {
               />
             </svg>
 
-            <div className="pointer-events-none absolute top-6 bottom-6 right-16 w-px bg-gradient-to-b from-[#f3d98a]/60 via-[#D4AF37]/50 to-[#f3d98a]/20 lg:hidden" />
+            <div className="pointer-events-none absolute top-6 bottom-6 end-16 w-px bg-gradient-to-b from-[#f3d98a]/60 via-[#D4AF37]/50 to-[#f3d98a]/20 lg:hidden" />
 
             <div className="relative grid grid-cols-1 lg:grid-cols-4 gap-20 lg:gap-6">
-              {ip.goals.items.map((g, i) => (
+              {t.goals.items.map((g, i) => (
                 <motion.div
                   key={g.title}
                   initial={{ opacity: 0, y: 40 }}
@@ -422,7 +461,7 @@ export default function IPPage() {
                       className="relative h-32 w-32 md:h-36 md:w-36 rounded-full flex items-center justify-center shadow-[0_15px_40px_-10px_rgba(0,0,0,0.6)] ring-1 ring-[#f3d98a]/40"
                       style={{ background: sphereGradient }}
                     >
-                      <span className="pointer-events-none absolute top-3 left-6 h-6 w-10 rounded-full bg-white/40 blur-md" />
+                      <span className="pointer-events-none absolute top-3 start-6 h-6 w-10 rounded-full bg-white/40 blur-md" />
                       <span className="material-symbols-outlined relative text-4xl font-bold text-[#354D40]">{g.icon}</span>
                     </div>
                   </motion.div>
@@ -442,13 +481,13 @@ export default function IPPage() {
       {/* Services — Dark */}
       <section id="services" className="scroll-mt-24 py-24 md:py-32 bg-[#354D40]">
         <div className="max-w-[1280px] mx-auto px-5 md:px-16">
-          <Reveal className="mb-20 text-center md:text-right">
-            <h2 className="font-head text-[32px] md:text-[48px] font-bold text-[#F7F5EE]">{ip.services.title}</h2>
-            <p className="font-body text-[17px] leading-[1.7] text-[#F7F5EE]/80 max-w-xl mt-4 mx-auto md:mx-0">{ip.services.intro}</p>
+          <Reveal className="mb-20 text-center md:text-start">
+            <h2 className="font-head text-[32px] md:text-[48px] font-bold text-[#F7F5EE]">{t.services.title}</h2>
+            <p className="font-body text-[17px] leading-[1.7] text-[#F7F5EE]/80 max-w-xl mt-4 mx-auto md:mx-0">{t.services.intro}</p>
           </Reveal>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-14">
-            {ip.services.grid.map((s, i) => (
+            {t.services.grid.map((s, i) => (
               <motion.div
                 key={s.title}
                 initial={{ opacity: 0, y: 30 }}
@@ -469,7 +508,7 @@ export default function IPPage() {
                   <div className="absolute inset-0 bg-gradient-to-br from-[#2F4A3C] via-[#2B4034] to-[#213228]" />
                   <motion.span
                     aria-hidden="true"
-                    className="absolute inset-y-0 -left-1/3 w-1/3 bg-gradient-to-r from-transparent via-[#D4AF37]/20 to-transparent skew-x-[-20deg]"
+                    className="absolute inset-y-0 -start-1/3 w-1/3 bg-gradient-to-r from-transparent via-[#D4AF37]/20 to-transparent skew-x-[-20deg]"
                     initial={{ x: "-40%", opacity: 0 }}
                     whileHover={{ x: "420%", opacity: 1 }}
                     transition={{ duration: 0.9, ease: "easeInOut" }}
@@ -483,7 +522,7 @@ export default function IPPage() {
                     className="relative h-[72px] w-[72px] rounded-full flex items-center justify-center shadow-[0_18px_30px_-10px_rgba(0,0,0,0.45)] ring-1 ring-[#f3d98a]/50"
                     style={{ background: sphereGradient }}
                   >
-                    <span className="pointer-events-none absolute top-2 left-4 h-4 w-7 rounded-full bg-white/40 blur-[6px]" />
+                    <span className="pointer-events-none absolute top-2 start-4 h-4 w-7 rounded-full bg-white/40 blur-[6px]" />
                     <span className="material-symbols-outlined relative text-3xl text-[#fbe9b8] drop-shadow-[0_0_8px_rgba(212,175,55,0.8)]">
                       {s.icon}
                     </span>
@@ -493,9 +532,9 @@ export default function IPPage() {
                 <h3 className="relative font-head text-xl font-bold mb-4 text-[#F7F5EE]">{s.title}</h3>
                 <p className="relative font-body text-[16px] leading-[1.75] text-[#F7F5EE]/75 mb-8">{s.body}</p>
                 <span className="relative inline-flex items-center gap-2 text-[#D4AF37] font-body text-sm font-semibold">
-                  المزيد
+                  {copy.more}
                   <span className="material-symbols-outlined text-base transition-transform duration-300 group-hover:-translate-x-1.5">
-                    arrow_back
+                    {copy.arrowIcon}
                   </span>
                 </span>
               </motion.div>
@@ -506,25 +545,25 @@ export default function IPPage() {
 
       {/* Legal Framework — Light */}
       <section className="relative overflow-hidden py-24 md:py-28 bg-[#F7F5EE] border-y border-[#D4AF37]/15">
-        <div className="pointer-events-none absolute top-0 left-1/4 h-72 w-72 rounded-full bg-[#D4AF37]/10 blur-[110px]" />
+        <div className="pointer-events-none absolute top-0 start-1/4 h-72 w-72 rounded-full bg-[#D4AF37]/10 blur-[110px]" />
 
         <Reveal className="relative max-w-[1280px] mx-auto px-5 md:px-16 flex flex-col md:flex-row items-center gap-12 md:gap-16">
           <div className="w-full md:w-3/5 order-2 md:order-1">
             <h2 className="font-head text-[28px] md:text-[36px] font-bold text-[#354D40] mb-6 leading-tight">
-              {ip.legalFramework.title}
+              {t.legalFramework.title}
             </h2>
-            <p className="font-body text-[18px] leading-[1.8] text-[#354D40]/90 mb-8 max-w-xl border-r-2 border-[#D4AF37]/50 pr-5">
-              {ip.legalFramework.paragraph}
+            <p className="font-body text-[18px] leading-[1.8] text-[#354D40]/90 mb-8 max-w-xl border-s-2 border-[#D4AF37]/50 ps-5">
+              {t.legalFramework.paragraph}
             </p>
             <div className="flex flex-wrap gap-3">
-              {ip.legalFramework.treaties.map((t) => (
+              {t.legalFramework.treaties.map((tr) => (
                 <motion.span
-                  key={t}
+                  key={tr}
                   whileHover={{ y: -2, boxShadow: "0 10px 30px -8px rgba(212,175,55,0.5)" }}
                   transition={{ type: "spring", stiffness: 260, damping: 18 }}
                   className="px-5 py-2.5 rounded-full bg-gradient-to-br from-[#354D40] to-[#2B4034] border border-[#D4AF37]/40 text-[#F7F5EE] font-body text-sm font-semibold shadow-[0_8px_20px_-8px_rgba(53,77,64,0.35)]"
                 >
-                  {t}
+                  {tr}
                 </motion.span>
               ))}
             </div>
@@ -559,8 +598,8 @@ export default function IPPage() {
               <div className="absolute inset-5 rounded-full ring-1 ring-[#D4AF37]/40" />
 
               <div className="absolute inset-9 rounded-full bg-gradient-to-br from-[#faf6ea] via-[#f3ecd8] to-[#e8dcb8] border border-[#D4AF37]/50 shadow-[0_20px_45px_-15px_rgba(0,0,0,0.35)] flex items-center justify-center p-2">
-                <span className="pointer-events-none absolute top-4 left-8 h-5 w-10 rounded-full bg-white/50 blur-md" />
-                <img src="/brand/ip-icon.png" alt={ip.tag} className="relative w-26 h-30 mx-auto" />
+                <span className="pointer-events-none absolute top-4 start-8 h-5 w-10 rounded-full bg-white/50 blur-md" />
+                <img src="/brand/ip-icon.png" alt={t.tag} className="relative w-26 h-30 mx-auto" />
               </div>
             </div>
           </div>
@@ -568,11 +607,11 @@ export default function IPPage() {
       </section>
 
       <PageCTA
-        title="احمِ ابتكارك وملكيتك الفكرية اليوم"
-        button="حجز استشارة"
-        email={ip.contact.email}
-        whatsapp={`https://wa.me/${ip.contact.phones[0].replace(/\D/g, "")}`}
-        phones={ip.contact.phones}
+        title={copy.ctaTitle}
+        button={copy.ctaButton}
+        email={t.contact.email}
+        whatsapp={`https://wa.me/${t.contact.phones[0].replace(/\D/g, "")}`}
+        phones={t.contact.phones}
       />
     </div>
   );

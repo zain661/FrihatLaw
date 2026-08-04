@@ -1,8 +1,9 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { legalPracticeIp } from "../data/legalPracticeIp";
-import { legalPracticeIpEn } from "../data/legalPracticeIp.en";
-import { ip } from "../data/ip";
+import { legalPracticeRealEstate } from "../data/legalPracticeRealEstate";
+import { legalPracticeRealEstateEn } from "../data/legalPracticeRealEstate.en";
+import { legal } from "../data/legal";
+import { legalEn } from "../data/legal.en";
 import { useLanguage } from "../lib/LanguageContext";
 import PageCTA from "../components/PageCTA";
 
@@ -20,45 +21,24 @@ function Reveal({ children, delay = 0, className = "" }) {
   );
 }
 
-const serviceIcons = {
-  corporate: (
-    <>
-      <path d="M4 21V9l8-5 8 5v12" />
-      <path d="M9 21v-6h6v6" />
-      <path d="M4 9h16" />
-    </>
-  ),
-  ip: (
-    <>
-      <path d="M12 3l7.5 3.2v5.6c0 5-3.2 8.6-7.5 10-4.3-1.4-7.5-5-7.5-10V6.2L12 3Z" />
-      <path d="M9 12.2l2 2 4-4.4" />
-    </>
-  ),
-  agency: (
-    <>
-      <path d="M3 10.5 12 4l9 6.5" />
-      <path d="M5 10v9h14v-9" />
-      <path d="M9.5 14.5h5" />
-    </>
-  ),
-};
-
-function ServiceIcon({ id }) {
+function RealEstateIcon() {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" className="h-8 w-8">
-      {serviceIcons[id] ?? serviceIcons.corporate}
+      <path d="M4 11.5 12 4l8 7.5" />
+      <path d="M6 10.5V20a1 1 0 0 0 1 1h3v-6h4v6h3a1 1 0 0 0 1-1v-9.5" />
     </svg>
   );
 }
 
 const COPY = {
-  ar: { back: "العودة إلى مجالات الممارسة", arrow: "→", ctaTitle: "تحتاج استشارة في حماية علامتك التجارية؟", ctaButton: "حجز استشارة" },
-  en: { back: "Back to Practice Areas", arrow: "←", ctaTitle: "Need a consultation to protect your trademark?", ctaButton: "Book a Consultation" },
+  ar: { back: "العودة إلى مجالات الممارسة", arrow: "→", ctaTitle: "لديك معاملة عقارية أو نزاع على ملكية بحاجة لمتابعة؟", ctaButton: "حجز استشارة" },
+  en: { back: "Back to Practice Areas", arrow: "←", ctaTitle: "Have a real estate transaction or ownership dispute that needs follow-up?", ctaButton: "Book a Consultation" },
 };
 
-export default function LegalPracticeIPPage() {
+export default function LegalPracticeRealEstatePage() {
   const { lang } = useLanguage();
-  const t = lang === "en" ? legalPracticeIpEn : legalPracticeIp;
+  const t = lang === "en" ? legalPracticeRealEstateEn : legalPracticeRealEstate;
+  const office = lang === "en" ? legalEn.office : legal.office;
   const copy = COPY[lang];
 
   return (
@@ -80,6 +60,9 @@ export default function LegalPracticeIPPage() {
             <p className="font-head text-sm md:text-base tracking-widest leading-relaxed text-[#D4AF37] font-semibold uppercase mb-5">
               {t.eyebrow}
             </p>
+            <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-[#D4AF37]/10 text-[#D4AF37]">
+              <RealEstateIcon />
+            </div>
             <h1 className="font-head text-3xl md:text-5xl font-extrabold text-[#F4F1EA] mb-8 leading-tight">
               {t.title}
             </h1>
@@ -107,7 +90,7 @@ export default function LegalPracticeIPPage() {
             >
               <div className="flex items-center gap-4 mb-6">
                 <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-[#D4AF37]/10 text-[#D4AF37]">
-                  <ServiceIcon id={s.icon} />
+                  <RealEstateIcon />
                 </div>
                 <h2 className="font-head text-xl md:text-2xl font-bold text-[#F4F1EA]">{s.title}</h2>
               </div>
@@ -145,9 +128,9 @@ export default function LegalPracticeIPPage() {
       <PageCTA
         title={copy.ctaTitle}
         button={copy.ctaButton}
-        email={ip.contact.email}
-        whatsapp={`https://wa.me/${ip.contact.phones[0].replace(/\D/g, "")}`}
-        phones={ip.contact.phones}
+        email={office.email}
+        whatsapp={`https://wa.me/${office.phones[1].replace(/\D/g, "")}`}
+        phones={office.phones}
       />
     </div>
   );

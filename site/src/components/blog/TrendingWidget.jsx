@@ -1,8 +1,26 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { getCategory } from "../../data/blog";
+import { getTrendingArticles } from "../../lib/articles";
 
-export default function TrendingWidget({ articles }) {
-  if (articles.length === 0) return null;
+export default function TrendingWidget() {
+  const [articles, setArticles] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    getTrendingArticles(4).then((data) => {
+      if (!cancelled) {
+        setArticles(data);
+        setLoading(false);
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  if (loading || articles.length === 0) return null;
 
   return (
     <div className="rounded-3xl border border-green/10 bg-paper p-6 shadow-[0_20px_45px_-25px_rgba(15,43,34,0.3)]">

@@ -2,14 +2,20 @@ import { useEffect, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { companies } from "../data/home";
+import { companiesEn } from "../data/home.en";
+import { useLanguage } from "../lib/LanguageContext";
 
-const N = companies.length;
 const AUTOPLAY_MS = 3000;
 
-function relativePosition(index, active) {
-  const rel = (index - active + N) % N;
+const COPY = {
+  ar: { eyebrow: "كياناتنا", title: "منظومة متكاملة تحت مظلة فريحات جروب", explore: "استكشف الكيان", arrow: "←", carousel: "كيانات فريحات جروب", prev: "الكيان السابق", next: "الكيان التالي" },
+  en: { eyebrow: "Our Entities", title: "An Integrated Ecosystem Under Frihat Group", explore: "Explore the Entity", arrow: "→", carousel: "Frihat Group Entities", prev: "Previous entity", next: "Next entity" },
+};
+
+function relativePosition(index, active, n) {
+  const rel = (index - active + n) % n;
   if (rel === 0) return 0;
-  return rel <= Math.floor(N / 2) ? rel : rel - N;
+  return rel <= Math.floor(n / 2) ? rel : rel - n;
 }
 
 function useSpreadOffset() {
@@ -28,7 +34,7 @@ function useSpreadOffset() {
   return offset;
 }
 
-function StackCard({ c, pos, offset, onSelect }) {
+function StackCard({ c, pos, offset, onSelect, t }) {
   const isActive = pos === 0;
 
   return (
@@ -48,7 +54,7 @@ function StackCard({ c, pos, offset, onSelect }) {
       }}
       transition={{ type: "spring", stiffness: 260, damping: 30 }}
     >
-      <div className="mb-6 text-right">
+      <div className="mb-6 text-start">
         <span className="font-head text-2xl font-black text-gold">{c.order}</span>
       </div>
 
@@ -70,15 +76,19 @@ function StackCard({ c, pos, offset, onSelect }) {
         className="mt-auto inline-flex w-fit items-center gap-1.5 font-head font-bold text-sm text-gold"
       >
         <span className="border-b-2 border-transparent pb-0.5 transition-colors duration-300 hover:border-current">
-          استكشف الكيان
+          {t.explore}
         </span>
-        <span aria-hidden="true">←</span>
+        <span aria-hidden="true">{t.arrow}</span>
       </Link>
     </motion.div>
   );
 }
 
 export default function Companies() {
+  const { lang } = useLanguage();
+  const t = COPY[lang];
+  const activeCompanies = lang === "en" ? companiesEn : companies;
+  const N = activeCompanies.length;
   const [active, setActive] = useState(0);
   const [hovering, setHovering] = useState(false);
   const reduceMotion = useReducedMotion();
@@ -88,12 +98,12 @@ export default function Companies() {
     if (reduceMotion || hovering) return;
     const id = setInterval(() => setActive((a) => (a + 1) % N), AUTOPLAY_MS);
     return () => clearInterval(id);
-  }, [active, hovering, reduceMotion]);
+  }, [active, hovering, reduceMotion, N]);
 
   return (
     <section className="relative overflow-hidden bg-paper border-t border-gold/12 py-14 md:py-20 px-6 md:px-10">
-      <div className="pointer-events-none absolute -top-24 -left-24 h-[420px] w-[420px] rounded-full bg-gold/10 blur-[130px]" />
-      <div className="pointer-events-none absolute bottom-0 right-0 h-72 w-72 rounded-full bg-teal/10 blur-[120px]" />
+      <div className="pointer-events-none absolute -top-24 -start-24 h-[420px] w-[420px] rounded-full bg-gold/10 blur-[130px]" />
+      <div className="pointer-events-none absolute bottom-0 end-0 h-72 w-72 rounded-full bg-teal/10 blur-[120px]" />
 
       <div className="relative mx-auto max-w-[1200px]">
         <motion.div
@@ -103,10 +113,8 @@ export default function Companies() {
           transition={{ duration: 0.5 }}
           className="text-center mb-16 max-w-2xl mx-auto"
         >
-          <p className="font-head text-base tracking-wide leading-relaxed text-gold font-semibold uppercase mb-5">كياناتنا</p>
-          <h2 className="font-head text-3xl md:text-5xl font-extrabold text-green-deep leading-tight">
-            منظومة متكاملة تحت مظلة فريحات جروب
-          </h2>
+          <p className="font-head text-base tracking-wide leading-relaxed text-gold font-semibold uppercase mb-5">{t.eyebrow}</p>
+          <h2 className="font-head text-3xl md:text-5xl font-extrabold text-green-deep leading-tight">{t.title}</h2>
         </motion.div>
 
         <div
@@ -116,13 +124,14 @@ export default function Companies() {
           onMouseLeave={() => setHovering(false)}
           role="region"
           aria-roledescription="carousel"
-          aria-label="كيانات فريحات جروب"
+          aria-label={t.carousel}
         >
-          {companies.map((c, i) => (
+          {activeCompanies.map((c, i) => (
             <StackCard
               key={c.id}
               c={c}
-              pos={relativePosition(i, active)}
+              t={t}
+              pos={relativePosition(i, active, N)}
               offset={offset}
               onSelect={() => setActive(i)}
             />
@@ -132,7 +141,7 @@ export default function Companies() {
         <div className="mt-10 flex items-center justify-center gap-6">
           <button
             onClick={() => setActive((a) => (a - 1 + N) % N)}
-            aria-label="الكيان السابق"
+            aria-label={t.prev}
             className="flex h-11 w-11 items-center justify-center rounded-full border border-gold/25 bg-cream text-green-deep transition-all duration-300 hover:border-gold/50 hover:-translate-y-0.5 hover:shadow-[0_10px_24px_-14px_rgba(197,160,89,0.5)]"
           >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
@@ -141,7 +150,7 @@ export default function Companies() {
           </button>
 
           <div className="flex gap-2">
-            {companies.map((c, i) => (
+            {activeCompanies.map((c, i) => (
               <button
                 key={c.id}
                 onClick={() => setActive(i)}
@@ -155,7 +164,7 @@ export default function Companies() {
 
           <button
             onClick={() => setActive((a) => (a + 1) % N)}
-            aria-label="الكيان التالي"
+            aria-label={t.next}
             className="flex h-11 w-11 items-center justify-center rounded-full border border-gold/25 bg-cream text-green-deep transition-all duration-300 hover:border-gold/50 hover:-translate-y-0.5 hover:shadow-[0_10px_24px_-14px_rgba(197,160,89,0.5)]"
           >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">

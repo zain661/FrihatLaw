@@ -40,11 +40,6 @@ export default function BlogPage() {
     };
   }, []);
 
-  const trending = useMemo(
-    () => [...allArticles].sort((a, b) => (b.views || 0) - (a.views || 0)).slice(0, 4),
-    [allArticles]
-  );
-
   const searched = useMemo(() => allArticles.filter((a) => matchesQuery(a, query)), [allArticles, query]);
   const filtered = active === "all" ? searched : searched.filter((a) => a.category === active);
   const suggestions = query.trim() ? searched.slice(0, 5) : [];
@@ -124,7 +119,7 @@ export default function BlogPage() {
             </div>
 
             <aside className="space-y-8 lg:sticky lg:top-28 self-start">
-              <TrendingWidget articles={trending} />
+              <TrendingWidget />
               <NewsletterBox />
             </aside>
           </div>

@@ -2,7 +2,31 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { nhr } from "../data/nhr";
+import { nhrEn } from "../data/nhr.en";
 import { contact } from "../data/shared";
+import { contactEn } from "../data/shared.en";
+import { useLanguage } from "../lib/LanguageContext";
+
+const COPY = {
+  ar: {
+    back: "العودة إلى كيان NHR",
+    arrow: "→",
+    supportTitle: "الدعم الفني وأمان البيانات",
+    ctaHeading: "جاهز لبناء منظومتك المتكاملة؟",
+    ctaSubtitle: "تواصل مع فريق كيان NHR وابدأ رحلة التحول اليوم",
+    ctaButton: "تواصل معنا الآن",
+    whatsapp: "واتساب",
+  },
+  en: {
+    back: "Back to Kayan NHR",
+    arrow: "←",
+    supportTitle: "Technical Support & Data Security",
+    ctaHeading: "Ready to build your integrated ecosystem?",
+    ctaSubtitle: "Get in touch with the Kayan NHR team and start your transformation journey today",
+    ctaButton: "Contact Us Now",
+    whatsapp: "WhatsApp",
+  },
+};
 
 function Reveal({ children, delay = 0, className = "" }) {
   return (
@@ -63,7 +87,7 @@ function ChecklistGrid({ items }) {
   );
 }
 
-function FeatureCard({ icon, title, items, delay = 0 }) {
+function FeatureCard({ icon, title, items, delay = 0, arrowIcon }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 16 }}
@@ -78,7 +102,7 @@ function FeatureCard({ icon, title, items, delay = 0 }) {
       <ul className="space-y-2">
         {items.map((it) => (
           <li key={it} className="flex items-start gap-2 text-sm leading-relaxed text-[#475569]">
-            <span className="material-symbols-outlined shrink-0 text-base text-[#06BAEB] mt-0.5">arrow_back</span>
+            <span className="material-symbols-outlined shrink-0 text-base text-[#06BAEB] mt-0.5">{arrowIcon}</span>
             {it}
           </li>
         ))}
@@ -112,23 +136,23 @@ function SplitColumn({ icon, title, intro, items, delay = 0 }) {
   );
 }
 
-function ModuleContent({ activeKey }) {
+function ModuleContent({ activeKey, t, copy }) {
   switch (activeKey) {
     case "hr":
       return (
         <div>
-          <ModuleHeader tag={nhr.hrServices.tag} title={nhr.hrServices.title} />
-          <ChecklistGrid items={nhr.hrServices.items} />
+          <ModuleHeader tag={t.hrServices.tag} title={t.hrServices.title} />
+          <ChecklistGrid items={t.hrServices.items} />
         </div>
       );
     case "tech":
       return (
         <div>
-          <ModuleHeader tag={nhr.systems.tag} title={nhr.systems.title} />
-          <p className="text-center text-[#475569] leading-relaxed max-w-2xl mx-auto mb-10">{nhr.systems.intro}</p>
+          <ModuleHeader tag={t.systems.tag} title={t.systems.title} />
+          <p className="text-center text-[#475569] leading-relaxed max-w-2xl mx-auto mb-10">{t.systems.intro}</p>
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {nhr.systems.groups.map((g, i) => (
-              <FeatureCard key={g.title} icon={g.icon} title={g.title} items={g.items} delay={i * 0.06} />
+            {t.systems.groups.map((g, i) => (
+              <FeatureCard key={g.title} icon={g.icon} title={g.title} items={g.items} delay={i * 0.06} arrowIcon={copy.arrow === "→" ? "arrow_back" : "arrow_forward"} />
             ))}
           </div>
         </div>
@@ -136,21 +160,21 @@ function ModuleContent({ activeKey }) {
     case "consulting":
       return (
         <div>
-          <ModuleHeader tag={nhr.consulting.tag} title={nhr.consulting.title} />
-          <ChecklistGrid items={nhr.consulting.items} />
+          <ModuleHeader tag={t.consulting.tag} title={t.consulting.title} />
+          <ChecklistGrid items={t.consulting.items} />
         </div>
       );
     case "support":
       return (
         <div>
-          <ModuleHeader tag={nhr.support.tag} title="الدعم الفني وأمان البيانات" />
+          <ModuleHeader tag={t.support.tag} title={copy.supportTitle} />
           <div className="grid gap-6 md:grid-cols-2 max-w-4xl mx-auto">
-            <SplitColumn icon="support_agent" title={nhr.support.title} items={nhr.support.items} />
+            <SplitColumn icon="support_agent" title={t.support.title} items={t.support.items} />
             <SplitColumn
               icon="shield_lock"
-              title={nhr.security.title}
-              intro={nhr.security.intro}
-              items={nhr.security.items}
+              title={t.security.title}
+              intro={t.security.intro}
+              items={t.security.items}
               delay={0.08}
             />
           </div>
@@ -161,9 +185,9 @@ function ModuleContent({ activeKey }) {
   }
 }
 
-function ModuleTabs({ tabs, active, onChange }) {
+function ModuleTabs({ tabs, active, onChange, lang }) {
   return (
-    <div dir="rtl" className="mb-14 flex flex-wrap justify-center gap-3">
+    <div dir={lang === "ar" ? "rtl" : undefined} className="mb-14 flex flex-wrap justify-center gap-3">
       {tabs.map((t) => (
         <button
           key={t.key}
@@ -184,7 +208,11 @@ function ModuleTabs({ tabs, active, onChange }) {
 }
 
 export default function ServicesPage() {
-  const { hero, tabs } = nhr.servicesPage;
+  const { lang } = useLanguage();
+  const t = lang === "en" ? nhrEn : nhr;
+  const copy = COPY[lang];
+  const activeContact = lang === "en" ? contactEn : contact;
+  const { hero, tabs } = t.servicesPage;
   const [active, setActive] = useState(tabs[0].key);
 
   return (
@@ -192,8 +220,8 @@ export default function ServicesPage() {
       {/* Hero */}
       <section className="relative overflow-hidden pt-32 pb-20 md:pt-40 md:pb-28 bg-gradient-to-br from-[#140F3A] via-[#123B7A] to-[#06AEDB] text-white">
         <DotGrid opacity={0.14} />
-        <div className="pointer-events-none absolute -top-40 -right-40 h-[520px] w-[520px] rounded-full bg-[#06BAEB]/25 blur-[120px]" />
-        <div className="pointer-events-none absolute -bottom-32 -left-32 h-[420px] w-[420px] rounded-full bg-[#3A2E8C]/40 blur-[110px]" />
+        <div className="pointer-events-none absolute -top-40 -end-40 h-[520px] w-[520px] rounded-full bg-[#06BAEB]/25 blur-[120px]" />
+        <div className="pointer-events-none absolute -bottom-32 -start-32 h-[420px] w-[420px] rounded-full bg-[#3A2E8C]/40 blur-[110px]" />
 
         <div className="relative z-10 max-w-[900px] mx-auto px-5 md:px-16 text-center">
           <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
@@ -201,8 +229,8 @@ export default function ServicesPage() {
               to="/kayan-nhr"
               className="mb-6 inline-flex items-center gap-2 text-sm font-bold text-[#8FF3FF] transition-colors hover:text-white"
             >
-              <span aria-hidden="true">→</span>
-              العودة إلى كيان NHR
+              <span aria-hidden="true">{copy.arrow}</span>
+              {copy.back}
             </Link>
             {hero.eyebrow && (
               <span className="mb-5 inline-flex items-center rounded-full border border-[#06BAEB]/40 bg-[#06BAEB]/10 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-[#8FF3FF]">
@@ -219,7 +247,7 @@ export default function ServicesPage() {
       <section className="py-24 md:py-32 bg-[#f9f9fc] px-5 md:px-16">
         <div className="max-w-[1200px] mx-auto">
           <Reveal>
-            <ModuleTabs tabs={tabs} active={active} onChange={setActive} />
+            <ModuleTabs tabs={tabs} active={active} onChange={setActive} lang={lang} />
           </Reveal>
 
           <motion.div
@@ -228,7 +256,7 @@ export default function ServicesPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.35 }}
           >
-            <ModuleContent activeKey={active} />
+            <ModuleContent activeKey={active} t={t} copy={copy} />
           </motion.div>
         </div>
       </section>
@@ -238,28 +266,28 @@ export default function ServicesPage() {
         <div className="mx-auto max-w-[1200px]">
           <Reveal className="relative overflow-hidden rounded-[36px] bg-gradient-to-br from-[#140F3A] via-[#123B7A] to-[#06AEDB] px-8 py-16 md:px-16 md:py-20 text-center text-white">
             <DotGrid opacity={0.12} />
-            <div className="pointer-events-none absolute -bottom-1/3 -right-1/4 h-[500px] w-[500px] rounded-full bg-[#22D3EE]/20 blur-[120px]" />
-            <div className="pointer-events-none absolute -top-1/3 -left-1/4 h-[400px] w-[400px] rounded-full bg-[#3A2E8C]/40 blur-[110px]" />
+            <div className="pointer-events-none absolute -bottom-1/3 -end-1/4 h-[500px] w-[500px] rounded-full bg-[#22D3EE]/20 blur-[120px]" />
+            <div className="pointer-events-none absolute -top-1/3 -start-1/4 h-[400px] w-[400px] rounded-full bg-[#3A2E8C]/40 blur-[110px]" />
             <div className="relative mx-auto max-w-xl">
               <div className="mb-6 inline-flex h-12 w-12 overflow-hidden rounded-2xl shadow-lg">
                 <img src="/brand/logo-nhr-icon.png" alt="" className="h-full w-full object-cover" />
               </div>
-              <h2 className="font-head mb-5 text-2xl md:text-4xl font-extrabold leading-tight">جاهز لبناء منظومتك المتكاملة؟</h2>
-              <p className="mb-10 text-lg leading-relaxed text-white/80">تواصل مع فريق كيان NHR وابدأ رحلة التحول اليوم</p>
+              <h2 className="font-head mb-5 text-2xl md:text-4xl font-extrabold leading-tight">{copy.ctaHeading}</h2>
+              <p className="mb-10 text-lg leading-relaxed text-white/80">{copy.ctaSubtitle}</p>
               <div className="flex flex-wrap justify-center gap-4">
                 <a
-                  href={`mailto:${contact.email}`}
+                  href={`mailto:${activeContact.email}`}
                   className="inline-flex items-center rounded-full bg-white px-9 py-4 font-head font-bold text-[#0B2255] transition-colors hover:bg-[#EAF7FB]"
                 >
-                  تواصل معنا الآن
+                  {copy.ctaButton}
                 </a>
                 <a
-                  href={`https://wa.me/${nhr.contact.phones[0].replace(/\D/g, "")}`}
+                  href={`https://wa.me/${t.contact.phones[0].replace(/\D/g, "")}`}
                   target="_blank"
                   rel="noreferrer"
                   className="inline-flex items-center rounded-full border border-white/40 px-9 py-4 font-head font-bold text-white transition-colors hover:bg-white/10"
                 >
-                  واتساب
+                  {copy.whatsapp}
                 </a>
               </div>
             </div>

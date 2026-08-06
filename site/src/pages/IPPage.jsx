@@ -47,8 +47,6 @@ const COPY = {
     visionMissionTitle: "رؤيتنا ورسالتنا",
     visionLabel: "رؤيتنا",
     missionLabel: "رسالتنا",
-    more: "المزيد",
-    arrowIcon: "arrow_back",
     ctaTitle: "ابدأ اليوم أولى خطوات حماية ملكيتك الفكرية",
     ctaButton: "حجز استشارة",
     collageLabels: { patents: "حماية البراءات", trademarks: "العلامات التجارية", copyright: "حقوق النشر", designs: "الرسوم الصناعية" },
@@ -61,8 +59,6 @@ const COPY = {
     visionMissionTitle: "Our Vision & Mission",
     visionLabel: "Our Vision",
     missionLabel: "Our Mission",
-    more: "More",
-    arrowIcon: "arrow_forward",
     ctaTitle: "Take the first step to protect your intellectual property today",
     ctaButton: "Book a Consultation",
     collageLabels: { patents: "Patent Protection", trademarks: "Trademarks", copyright: "Copyright", designs: "Industrial Designs" },
@@ -530,13 +526,7 @@ export default function IPPage() {
                 </div>
 
                 <h3 className="relative font-head text-xl font-bold mb-4 text-[#F7F5EE]">{s.title}</h3>
-                <p className="relative font-body text-[16px] leading-[1.75] text-[#F7F5EE]/75 mb-8">{s.body}</p>
-                <span className="relative inline-flex items-center gap-2 text-[#D4AF37] font-body text-sm font-semibold">
-                  {copy.more}
-                  <span className="material-symbols-outlined text-base transition-transform duration-300 group-hover:-translate-x-1.5">
-                    {copy.arrowIcon}
-                  </span>
-                </span>
+                <p className="relative font-body text-[16px] leading-[1.75] text-[#F7F5EE]/75">{s.body}</p>
               </motion.div>
             ))}
           </div>

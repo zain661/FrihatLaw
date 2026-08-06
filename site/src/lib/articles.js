@@ -16,13 +16,22 @@ function autoExcerpt(content) {
   return flat.slice(0, 140) + (flat.length > 140 ? "…" : "");
 }
 
+// `read_time` is precomputed and stored at write time (see createArticle /
+// updateArticle) so list queries can skip fetching the heavy `content` field
+// entirely. Falls back to computing it from `content` for seed articles and
+// as a safety net for any row written before the column existed.
 function withReadTime(article) {
-  return { ...article, readTime: computeReadTime(article.content) };
+  const { read_time, ...rest } = article;
+  return { ...rest, readTime: read_time ?? computeReadTime(article.content ?? "") };
 }
 
 function byDateDesc(a, b) {
   return new Date(b.date) - new Date(a.date);
 }
+
+// Lightweight field set for article list/card views — deliberately excludes
+// `content` (the heavy field) to keep list queries fast.
+const LIST_FIELDS = "id, title, excerpt, image, date, views, category, author, read_time";
 
 // Until Supabase is configured, the site still renders (read-only) using the
 // bundled seed articles, instead of hard-crashing every page that lists them.
@@ -30,7 +39,7 @@ export async function getAllArticles() {
   if (!supabaseConfigured) {
     return seedArticles.map(withReadTime).sort(byDateDesc);
   }
-  const { data, error } = await supabase.from("articles").select("*").order("date", { ascending: false });
+  const { data, error } = await supabase.from("articles").select(LIST_FIELDS).order("date", { ascending: false });
   if (error) throw error;
   return data.map(withReadTime);
 }
@@ -54,7 +63,7 @@ export async function getTrendingArticles(limit = 4) {
   }
   const { data, error } = await supabase
     .from("articles")
-    .select("*")
+    .select(LIST_FIELDS)
     .order("views", { ascending: false })
     .limit(limit);
   if (error) throw error;
@@ -126,6 +135,7 @@ export async function createArticle({ title, content, author, category, image })
     image,
     date: new Date().toISOString().slice(0, 10),
     views: 0,
+    read_time: computeReadTime(content),
   };
   const { error } = await supabase.from("articles").insert(article);
   if (error) throw error;
@@ -134,7 +144,15 @@ export async function createArticle({ title, content, author, category, image })
 
 export async function updateArticle(id, { title, content, author, category, image }) {
   if (!supabaseConfigured) throw new Error(NOT_CONFIGURED_MESSAGE);
-  const updates = { title, excerpt: autoExcerpt(content), content, author, category, image };
+  const updates = {
+    title,
+    excerpt: autoExcerpt(content),
+    content,
+    author,
+    category,
+    image,
+    read_time: computeReadTime(content),
+  };
   const { data, error } = await supabase.from("articles").update(updates).eq("id", id).select().maybeSingle();
   if (error) throw error;
   return data;

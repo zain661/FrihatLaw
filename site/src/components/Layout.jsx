@@ -1,7 +1,8 @@
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
+import PageLoader from "./PageLoader";
 
 export default function Layout() {
   const location = useLocation();
@@ -20,7 +21,9 @@ export default function Layout() {
   return (
     <>
       <Navbar />
-      <Outlet />
+      <Suspense fallback={<PageLoader />}>
+        <Outlet />
+      </Suspense>
       <Footer />
     </>
   );

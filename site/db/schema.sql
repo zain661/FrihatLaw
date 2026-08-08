@@ -1,5 +1,12 @@
--- Frihat Group blog articles table.
--- Run this once in the Supabase SQL editor (Project -> SQL Editor -> New query -> paste -> Run).
+-- Frihat Group database schema — self-hosted Postgres + PostgREST on Railway.
+-- Run this once against the Railway Postgres: psql "$DATABASE_URL" -f site/db/schema.sql
+
+-- PostgREST wiring — `web_anon` is the role PostgREST assumes for every
+-- unauthenticated request (PGRST_DB_ANON_ROLE=web_anon on the PostgREST
+-- service). RLS policies below (which have no `TO <role>` clause, so they
+-- apply to any role including web_anon) then decide what it can actually do.
+create role web_anon nologin;
+grant usage on schema public to web_anon;
 
 create table if not exists public.articles (
   id text primary key,
@@ -15,15 +22,6 @@ create table if not exists public.articles (
   created_at timestamptz not null default now()
 );
 
--- Migration for tables created before read_time existed — precomputed
--- estimated read minutes, stored at write time so the article list/card
--- views can query it directly instead of fetching and measuring `content`.
-alter table public.articles add column if not exists read_time integer not null default 2;
-
-update public.articles
-set read_time = greatest(2, round(array_length(regexp_split_to_array(trim(both from content), '\s+'), 1) / 180.0))
-where content is not null and trim(both from content) <> '';
-
 alter table public.articles enable row level security;
 
 -- Everyone (including anonymous site visitors) can read articles.
@@ -33,11 +31,10 @@ create policy "Public read access" on public.articles
 -- The /admin/post-article password screen is a client-side UI gate only,
 -- not real authentication (see AdminGate.jsx). These policies are
 -- intentionally open to anon so the publish/edit/delete flow keeps working
--- without a backend. That also means anyone who finds the anon key (visible
--- in the deployed JS bundle) could write directly via the Supabase API,
--- bypassing the password screen. Acceptable for an internal soft launch;
--- swap for Supabase Auth + scoped policies before this holds anything
--- sensitive.
+-- without a backend. That also means anyone who finds the PostgREST URL
+-- (visible in the deployed JS bundle) could write directly via the REST
+-- API, bypassing the password screen. Acceptable for an internal soft
+-- launch; add real auth before this holds anything sensitive.
 create policy "Public insert access" on public.articles
   for insert with check (true);
 
@@ -47,9 +44,10 @@ create policy "Public update access" on public.articles
 create policy "Public delete access" on public.articles
   for delete using (true);
 
--- Atomic view counter — run this in the Supabase SQL editor too.
--- Called via supabase.rpc('increment_views', { article_id }) from the site
--- so concurrent readers can't race a read-modify-write on the client.
+grant select, insert, update, delete on public.articles to web_anon;
+
+-- Atomic view counter — called via postgrest.rpc('increment_views', { article_id })
+-- from the site so concurrent readers can't race a read-modify-write on the client.
 create or replace function public.increment_views(article_id text)
 returns void
 language sql
@@ -57,7 +55,7 @@ as $$
   update public.articles set views = coalesce(views, 0) + 1 where id = article_id;
 $$;
 
-grant execute on function public.increment_views(text) to anon, authenticated;
+grant execute on function public.increment_views(text) to web_anon;
 
 -- Newsletter subscribers.
 create table if not exists public.newsletter_subscribers (
@@ -70,34 +68,17 @@ alter table public.newsletter_subscribers enable row level security;
 
 -- Visitors can subscribe (insert their own email) but cannot read the list
 -- back — that would leak every other subscriber's address to anyone with
--- the public anon key. Reading the list is done server-side only (service
--- role key), e.g. by scripts/send-newsletter.mjs.
+-- the PostgREST URL. Reading the list is done server-side only (direct `pg`
+-- connection with the full DATABASE_URL, bypassing PostgREST/RLS entirely),
+-- e.g. by scripts/send-newsletter.mjs.
 create policy "Public insert access" on public.newsletter_subscribers
   for insert with check (true);
 
--- Public storage bucket for article cover images — replaces storing images
--- as base64 data URLs directly in the articles table.
-insert into storage.buckets (id, name, public)
-values ('article-images', 'article-images', true)
-on conflict (id) do nothing;
+grant insert on public.newsletter_subscribers to web_anon;
 
--- Everyone (including anonymous site visitors) can view uploaded images —
--- required since article covers are rendered on public blog pages.
-create policy "Public read access for article images" on storage.objects
-  for select using (bucket_id = 'article-images');
-
--- Same soft-launch tradeoff as the articles table above: the admin publish
--- flow only has a client-side password gate (see AdminGate.jsx), so uploads
--- run through the anon key. Swap for Supabase Auth + scoped policies before
--- this holds anything sensitive.
-create policy "Public upload access for article images" on storage.objects
-  for insert with check (bucket_id = 'article-images');
-
-create policy "Public update access for article images" on storage.objects
-  for update using (bucket_id = 'article-images');
-
-create policy "Public delete access for article images" on storage.objects
-  for delete using (bucket_id = 'article-images');
+-- Article cover images live on the separate Uploads service (Railway Volume),
+-- not in Postgres — see site/server/uploads/. `articles.image` just stores
+-- that service's public URL.
 
 -- Seed content — regenerate with: node scripts/generate-seed-sql.mjs
 -- Safe to re-run; existing rows with the same id are skipped.
@@ -144,4 +125,3 @@ values
 
 يرافق فريحات للمحاماة والاستشارات المؤسسين في كل خطوة من هذا المسار، لضمان تأسيس قانوني سليم يحمي حقوقهم منذ اليوم الأول.', '{"name":"المحامية أسيل","title":"رئيسة قسم الشركات والخدمات المحلية"}'::jsonb, 'legal', '/brand/office-height-1.jpg', '2026-05-12', 0, 2)
 on conflict (id) do nothing;
-

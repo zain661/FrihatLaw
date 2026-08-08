@@ -12,7 +12,7 @@ dist
 dist-ssr
 *.local
 
-# Supabase credentials — never commit real keys
+# Service URLs / secrets — never commit real values
 .env
 
 # Editor directories and files

@@ -3,16 +3,20 @@
 // This site is a static Vite SPA with no backend server/API routes, so this
 // is a standalone script — not something the site can trigger by itself yet.
 // Run it by hand right after publishing an article (or wire it into a CI
-// job / cron / Supabase database webhook later if you want it automatic):
+// job / cron later if you want it automatic):
 //
 //   node --env-file=scripts/.env scripts/send-newsletter.mjs <articleId>
 //
 // Required env vars — put them in scripts/.env (already covered by the
 // repo's ".env" gitignore rule, so it won't be committed). See
 // scripts/.env.example for the full list. Never prefix these with VITE_ —
-// that would bundle the service-role/Resend keys into the public site.
+// that would bundle the DB/Resend credentials into the public site.
+//
+// Connects to Postgres directly with the full DATABASE_URL (not through
+// PostgREST) — same trust level as the old Supabase service-role key: full
+// access, bypasses RLS, server-side only.
 
-import { createClient } from "@supabase/supabase-js";
+import { Pool } from "pg";
 import { Resend } from "resend";
 
 const BATCH_SIZE = 100; // Resend's batch send limit per call
@@ -73,34 +77,26 @@ async function main() {
     process.exit(1);
   }
 
-  const SUPABASE_URL = requireEnv("SUPABASE_URL");
-  const SUPABASE_SERVICE_ROLE_KEY = requireEnv("SUPABASE_SERVICE_ROLE_KEY");
+  const DATABASE_URL = requireEnv("DATABASE_URL");
   const RESEND_API_KEY = requireEnv("RESEND_API_KEY");
   const RESEND_FROM_EMAIL = requireEnv("RESEND_FROM_EMAIL");
   const SITE_URL = process.env.SITE_URL || "https://frihatlaw-production-3d94.up.railway.app";
 
-  // Service-role key bypasses RLS — required here since the anon key is
-  // intentionally blocked from reading newsletter_subscribers (see schema.sql).
-  const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+  const pool = new Pool({ connectionString: DATABASE_URL });
   const resend = new Resend(RESEND_API_KEY);
 
-  const { data: article, error: articleError } = await supabase
-    .from("articles")
-    .select("*")
-    .eq("id", articleId)
-    .maybeSingle();
-  if (articleError) throw articleError;
+  const { rows: articleRows } = await pool.query("select * from public.articles where id = $1", [articleId]);
+  const article = articleRows[0];
   if (!article) {
     console.error(`No article found with id "${articleId}"`);
+    await pool.end();
     process.exit(1);
   }
 
-  const { data: subscribers, error: subsError } = await supabase
-    .from("newsletter_subscribers")
-    .select("email");
-  if (subsError) throw subsError;
+  const { rows: subscribers } = await pool.query("select email from public.newsletter_subscribers");
   if (!subscribers || subscribers.length === 0) {
     console.log("No subscribers to send to. Done.");
+    await pool.end();
     return;
   }
 
@@ -124,6 +120,7 @@ async function main() {
   }
 
   console.log(`Sent "${article.title}" to ${sent}/${subscribers.length} subscriber(s).`);
+  await pool.end();
 }
 
 main().catch((err) => {

@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { FILTERS, blogHero } from "../data/blog";
 import { getAllArticles } from "../lib/articles";
-import { supabaseConfigured } from "../lib/supabaseClient";
+import { apiConfigured } from "../lib/apiClient";
 import HeroSpotlight from "../components/blog/HeroSpotlight";
 import SearchBar from "../components/blog/SearchBar";
 import CategoryTabs from "../components/blog/CategoryTabs";
@@ -64,7 +64,7 @@ export default function BlogPage() {
         >
           ⚙️ لوحة النشر للفريق
         </Link>
-        {!supabaseConfigured && (
+        {!apiConfigured && (
           <p className="absolute bottom-5 right-5 rounded-full border border-amber-300/40 bg-amber-400/10 px-3.5 py-1.5 text-[11px] font-semibold text-amber-200">
             وضع القراءة فقط — لم يتم ربط قاعدة البيانات بعد
           </p>

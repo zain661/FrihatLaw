@@ -1,10 +1,10 @@
-import { supabase, supabaseConfigured } from "./supabaseClient";
+import { postgrest, apiConfigured, uploadUrl } from "./apiClient";
 import { seedArticles } from "../data/blog";
 
 const WORDS_PER_MINUTE = 180;
 
 const NOT_CONFIGURED_MESSAGE =
-  "قاعدة البيانات غير مُهيأة بعد. أضف VITE_SUPABASE_URL و VITE_SUPABASE_ANON_KEY في ملف .env ثم أعد تشغيل الخادم.";
+  "قاعدة البيانات غير مُهيأة بعد. أضف VITE_POSTGREST_URL و VITE_UPLOAD_URL في ملف .env ثم أعد تشغيل الخادم.";
 
 function computeReadTime(content) {
   const words = content.trim().split(/\s+/).filter(Boolean).length;
@@ -33,35 +33,35 @@ function byDateDesc(a, b) {
 // `content` (the heavy field) to keep list queries fast.
 const LIST_FIELDS = "id, title, excerpt, image, date, views, category, author, read_time";
 
-// Until Supabase is configured, the site still renders (read-only) using the
+// Until the API is configured, the site still renders (read-only) using the
 // bundled seed articles, instead of hard-crashing every page that lists them.
 export async function getAllArticles() {
-  if (!supabaseConfigured) {
+  if (!apiConfigured) {
     return seedArticles.map(withReadTime).sort(byDateDesc);
   }
-  const { data, error } = await supabase.from("articles").select(LIST_FIELDS).order("date", { ascending: false });
+  const { data, error } = await postgrest.from("articles").select(LIST_FIELDS).order("date", { ascending: false });
   if (error) throw error;
   return data.map(withReadTime);
 }
 
 export async function getArticleById(id) {
-  if (!supabaseConfigured) {
+  if (!apiConfigured) {
     const found = seedArticles.find((a) => a.id === id);
     return found ? withReadTime(found) : null;
   }
-  const { data, error } = await supabase.from("articles").select("*").eq("id", id).maybeSingle();
+  const { data, error } = await postgrest.from("articles").select("*").eq("id", id).maybeSingle();
   if (error) throw error;
   return data ? withReadTime(data) : null;
 }
 
 export async function getTrendingArticles(limit = 4) {
-  if (!supabaseConfigured) {
+  if (!apiConfigured) {
     return seedArticles
       .map(withReadTime)
       .sort((a, b) => (b.views || 0) - (a.views || 0))
       .slice(0, limit);
   }
-  const { data, error } = await supabase
+  const { data, error } = await postgrest
     .from("articles")
     .select(LIST_FIELDS)
     .order("views", { ascending: false })
@@ -72,9 +72,9 @@ export async function getTrendingArticles(limit = 4) {
 
 // Best-effort — a failed view count should never break the article page.
 export async function incrementArticleViews(articleId) {
-  if (!supabaseConfigured) return;
+  if (!apiConfigured) return;
   try {
-    const { error } = await supabase.rpc("increment_views", { article_id: articleId });
+    const { error } = await postgrest.rpc("increment_views", { article_id: articleId });
     if (error) throw error;
   } catch (err) {
     console.error("Failed to increment article views:", err);
@@ -83,13 +83,13 @@ export async function incrementArticleViews(articleId) {
 
 export async function subscribeToNewsletter(email) {
   const normalized = email.trim().toLowerCase();
-  if (!supabaseConfigured) {
+  if (!apiConfigured) {
     throw new Error("الاشتراك في النشرة غير متاح حاليًا، حاول لاحقًا.");
   }
 
   let result;
   try {
-    result = await supabase.from("newsletter_subscribers").insert({ email: normalized });
+    result = await postgrest.from("newsletter_subscribers").insert({ email: normalized });
   } catch {
     throw new Error("تعذّر الاتصال بالخادم، تحقق من اتصالك بالإنترنت وحاول مرة أخرى.");
   }
@@ -103,28 +103,33 @@ export async function subscribeToNewsletter(email) {
   }
 }
 
-const IMAGE_BUCKET = "article-images";
-
-// Uploads a cover image to Supabase Storage and returns its public URL —
-// articles store a plain HTTP URL in the `image` column, never raw base64.
+// Uploads a cover image to the Uploads service (Railway Volume) and returns
+// its public URL — articles store a plain HTTP URL in the `image` column,
+// never raw base64.
 export async function uploadArticleImage(file) {
-  if (!supabaseConfigured) throw new Error(NOT_CONFIGURED_MESSAGE);
+  if (!apiConfigured) throw new Error(NOT_CONFIGURED_MESSAGE);
 
-  const safeName = file.name.replace(/[^a-zA-Z0-9.\-_]/g, "_");
-  const filePath = `articles/${Date.now()}-${safeName}`;
+  const formData = new FormData();
+  formData.append("file", file);
 
-  const { error } = await supabase.storage.from(IMAGE_BUCKET).upload(filePath, file);
-  if (error) {
-    console.error("Failed to upload article image:", error);
+  let response;
+  try {
+    response = await fetch(`${uploadUrl}/upload`, { method: "POST", body: formData });
+  } catch (err) {
+    console.error("Failed to upload article image:", err);
+    throw new Error("تعذّر رفع الصورة، حاول مرة أخرى.");
+  }
+  if (!response.ok) {
+    console.error("Failed to upload article image:", await response.text().catch(() => response.statusText));
     throw new Error("تعذّر رفع الصورة، حاول مرة أخرى.");
   }
 
-  const { data } = supabase.storage.from(IMAGE_BUCKET).getPublicUrl(filePath);
-  return data.publicUrl;
+  const { url } = await response.json();
+  return url;
 }
 
 export async function createArticle({ title, content, author, category, image }) {
-  if (!supabaseConfigured) throw new Error(NOT_CONFIGURED_MESSAGE);
+  if (!apiConfigured) throw new Error(NOT_CONFIGURED_MESSAGE);
   const article = {
     id: `art-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
     title,
@@ -137,13 +142,13 @@ export async function createArticle({ title, content, author, category, image })
     views: 0,
     read_time: computeReadTime(content),
   };
-  const { error } = await supabase.from("articles").insert(article);
+  const { error } = await postgrest.from("articles").insert(article);
   if (error) throw error;
   return article;
 }
 
 export async function updateArticle(id, { title, content, author, category, image }) {
-  if (!supabaseConfigured) throw new Error(NOT_CONFIGURED_MESSAGE);
+  if (!apiConfigured) throw new Error(NOT_CONFIGURED_MESSAGE);
   const updates = {
     title,
     excerpt: autoExcerpt(content),
@@ -153,13 +158,13 @@ export async function updateArticle(id, { title, content, author, category, imag
     image,
     read_time: computeReadTime(content),
   };
-  const { data, error } = await supabase.from("articles").update(updates).eq("id", id).select().maybeSingle();
+  const { data, error } = await postgrest.from("articles").update(updates).eq("id", id).select().maybeSingle();
   if (error) throw error;
   return data;
 }
 
 export async function deleteArticle(id) {
-  if (!supabaseConfigured) throw new Error(NOT_CONFIGURED_MESSAGE);
-  const { error } = await supabase.from("articles").delete().eq("id", id);
+  if (!apiConfigured) throw new Error(NOT_CONFIGURED_MESSAGE);
+  const { error } = await postgrest.from("articles").delete().eq("id", id);
   if (error) throw error;
 }

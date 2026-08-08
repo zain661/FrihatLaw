@@ -23,6 +23,7 @@ const upload = multer({
 });
 
 const app = express();
+app.set("trust proxy", true); // Railway terminates TLS at its edge proxy; trust X-Forwarded-Proto so req.protocol reports https
 app.use(cors());
 app.use("/files", express.static(DATA_DIR, { maxAge: "30d", immutable: true }));
 

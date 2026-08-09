@@ -243,7 +243,7 @@ export default function Navbar() {
           })}
         </nav>
 
-        <div className="hidden md:flex items-center gap-3">
+        <div className="hidden lg:flex items-center gap-3">
           <LanguageToggle dark={dark} />
           <Link
             to="/#contact"
@@ -253,9 +253,13 @@ export default function Navbar() {
           </Link>
         </div>
 
-        <div className="flex items-center gap-2 md:hidden">
+        <div className="flex items-center gap-2 lg:hidden">
           <LanguageToggle dark={dark} />
-          <button onClick={() => setOpen((v) => !v)} className="flex flex-col gap-1.5 p-2" aria-label={menuLabel}>
+          <button
+            onClick={() => setOpen((v) => !v)}
+            className="flex min-h-[44px] min-w-[44px] flex-col items-center justify-center gap-1.5"
+            aria-label={menuLabel}
+          >
             <span className={`w-6 h-0.5 rounded-full transition-colors ${dark ? "bg-green-deep" : "bg-cream"}`} />
             <span className={`w-6 h-0.5 rounded-full transition-colors ${dark ? "bg-green-deep" : "bg-cream"}`} />
             <span className={`w-6 h-0.5 rounded-full transition-colors ${dark ? "bg-green-deep" : "bg-cream"}`} />

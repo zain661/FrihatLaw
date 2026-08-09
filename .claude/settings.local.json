@@ -57,7 +57,13 @@
       "Bash(git commit *)",
       "Bash(git push *)",
       "Bash(npm view *)",
-      "Bash(node scripts/generate-seed-sql.mjs)"
+      "Bash(node scripts/generate-seed-sql.mjs)",
+      "Bash(/c/WINDOWS/system32/convert /?)",
+      "Read(//c/Program Files/**)",
+      "Read(//c/Program Files \\\\\\(x86\\\\\\)/**)",
+      "Bash(/c/Users/2024/AppData/Local/Programs/Python/Python313/python -c ' *)",
+      "PowerShell(Add-Type -AssemblyName System.Drawing; $img = [System.Drawing.Image]::FromFile\\(\"C:\\\\Users\\\\2024\\\\Downloads\\\\cool animations\\\\site\\\\public\\\\brand\\\\logo-group.png\"\\); $bmp = New-Object System.Drawing.Bitmap\\($img\\); $hasAlpha=$false; for\\($x=0;$x -lt $bmp.Width; $x+=20\\){ for\\($y=0;$y -lt $bmp.Height; $y+=20\\){ $p=$bmp.GetPixel\\($x,$y\\); if\\($p.A -lt 250\\){$hasAlpha=$true} } }; Write-Output \"Size: $\\($bmp.Width\\)x$\\($bmp.Height\\) HasTransparentPixels: $hasAlpha\"; $corner=$bmp.GetPixel\\(2,2\\); Write-Output \"Corner pixel: A=$\\($corner.A\\) R=$\\($corner.R\\) G=$\\($corner.G\\) B=$\\($corner.B\\)\")",
+      "mcp__railway__list-domains"
     ]
   }
 }

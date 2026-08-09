@@ -6,7 +6,7 @@ import { nhrEn } from "../data/nhr.en";
 import { contact } from "../data/shared";
 import { contactEn } from "../data/shared.en";
 import { useLanguage } from "../lib/LanguageContext";
-import { PayrollMockup, MobileMockup, AttendanceMockup } from "../components/nhr/Mockups";
+import { PayrollMockup, AttendanceMockup } from "../components/nhr/Mockups";
 
 const HUB_NODES = {
   ar: [
@@ -50,9 +50,18 @@ const COPY = {
   },
 };
 
+function SelfServiceMockup() {
+  return (
+    <div className="relative mx-auto w-fit">
+      <div className="pointer-events-none absolute -inset-8 rounded-[48px] bg-gradient-to-br from-[#06BAEB]/25 to-[#0B5FA5]/10 blur-2xl" />
+      <img src="/brand/nhr-self-service.png" alt="" className="relative h-[280px] w-auto sm:h-[320px] lg:h-[360px]" />
+    </div>
+  );
+}
+
 const SHOWCASE_MOCKUPS = {
   payroll: PayrollMockup,
-  mobile: MobileMockup,
+  mobile: SelfServiceMockup,
   attendance: AttendanceMockup,
 };
 
@@ -139,7 +148,7 @@ function DotGrid({ opacity = 0.1 }) {
 function FeatureRow({ tag, title, desc, mockupKey, reverse, lang }) {
   const Mockup = SHOWCASE_MOCKUPS[mockupKey];
   return (
-    <Reveal className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
+    <Reveal className="grid items-center gap-10 lg:grid-cols-2 lg:gap-20">
       <div className={reverse ? "lg:order-2" : ""}>
         <Mockup lang={lang} />
       </div>

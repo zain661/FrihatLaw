@@ -201,17 +201,6 @@ export const nhrEn = {
       },
     ],
   },
-  consulting: {
-    tag: "Trusted Consulting",
-    title: "Administrative & Financial Consulting",
-    items: [
-      "Managing companies' financial accounts",
-      "Preparing periodic financial reports and providing a comprehensive view for planning and decision-making",
-      "Providing timely financial advice",
-      "Preparing feasibility studies for projects and startups",
-      "Conducting market studies to support investment decisions",
-    ],
-  },
   support: {
     tag: "Support & Protection",
     title: "Technical Support & Fingerprint Solutions",
@@ -268,7 +257,6 @@ export const nhrEn = {
     tabs: [
       { key: "hr", icon: "groups", label: "Human Resources" },
       { key: "tech", icon: "hub", label: "Technical Systems" },
-      { key: "consulting", icon: "finance", label: "Financial Consulting" },
       { key: "support", icon: "shield_lock", label: "Support & Security" },
     ],
   },

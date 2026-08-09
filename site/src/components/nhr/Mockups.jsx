@@ -20,12 +20,6 @@ const COPY = {
     payrollHeader: "مسير رواتب — تشرين الثاني",
     autoCalculated: "محتسب تلقائيًا",
     paid: "مدفوع",
-    time: "٩:٤١",
-    greeting: "مرحبًا، سارة 👋",
-    leaveBalance: "رصيد الإجازات",
-    leaveDays: "١٤ يوم",
-    clockIn: "تسجيل حضور",
-    payslip: "قسيمة الراتب",
     location: "الموقع الجغرافي",
     gpsVerified: "GPS محقّق",
     officeLabel: "مكتب رام الله الرئيسي",
@@ -41,12 +35,6 @@ const COPY = {
     payrollHeader: "Payroll — November",
     autoCalculated: "Auto-calculated",
     paid: "Paid",
-    time: "9:41",
-    greeting: "Hi, Sara 👋",
-    leaveBalance: "Leave Balance",
-    leaveDays: "14 days",
-    clockIn: "Clock In",
-    payslip: "Payslip",
     location: "Location",
     gpsVerified: "GPS Verified",
     officeLabel: "Ramallah Main Office",
@@ -110,41 +98,6 @@ export function PayrollMockup({ lang = "ar" }) {
         ))}
       </div>
     </MockupFrame>
-  );
-}
-
-export function MobileMockup({ lang = "ar" }) {
-  const t = COPY[lang];
-  const dir = lang === "ar" ? "rtl" : undefined;
-  return (
-    <div className="relative mx-auto w-full max-w-[240px]">
-      <div className="pointer-events-none absolute -inset-5 rounded-[40px] bg-gradient-to-br from-[#06BAEB]/25 to-[#0B5FA5]/10 blur-2xl" />
-      <div className="relative overflow-hidden rounded-[32px] border-[6px] border-white/15 bg-[#0B1339] shadow-[0_30px_70px_-20px_rgba(6,15,50,0.55)]">
-        <div className="flex items-center justify-between px-4 pt-4 pb-2">
-          <span className="text-[10px] text-white/40">{t.time}</span>
-          <span className="h-1 w-10 rounded-full bg-white/15" />
-        </div>
-        <div dir={dir} className="px-4 pb-5">
-          <p className="mb-3 text-xs text-white/60">{t.greeting}</p>
-          <div className="mb-3 rounded-2xl border border-white/10 bg-gradient-to-br from-[#06BAEB]/20 to-[#0B5FA5]/20 p-4">
-            <p className="mb-1 text-[10px] text-white/60">{t.leaveBalance}</p>
-            <p className="text-lg font-bold text-white">{t.leaveDays}</p>
-          </div>
-          <button
-            type="button"
-            tabIndex={-1}
-            className="mb-3 flex w-full items-center justify-center gap-1.5 rounded-xl bg-[#22D3EE] py-3 text-xs font-bold text-[#0B2255]"
-          >
-            <span className="material-symbols-outlined text-sm">fingerprint</span>
-            {t.clockIn}
-          </button>
-          <div className="flex items-center justify-between rounded-xl border border-white/10 bg-white/[0.05] p-3">
-            <span className="text-[10px] font-semibold text-white/70">{t.payslip}</span>
-            <span className="material-symbols-outlined text-sm text-[#22D3EE]">{lang === "en" ? "arrow_forward" : "arrow_back"}</span>
-          </div>
-        </div>
-      </div>
-    </div>
   );
 }
 

@@ -317,27 +317,9 @@ export default function IPPage() {
                     i === 1 ? "lg:-mt-8" : "lg:mt-8"
                   }`}
                 >
-                  <span className="absolute top-6 start-8 font-head text-5xl font-black bg-gradient-to-br from-[#D4AF37] via-[#9A7B2F] to-[#5c4a1a] bg-clip-text text-transparent opacity-25 select-none">
+                  <span className="relative z-10 block font-head text-4xl font-bold text-[#9A7B2F] mb-4 select-none">
                     0{i + 1}
                   </span>
-
-                  <motion.span
-                    whileHover={{
-                      boxShadow: [
-                        "0 0 20px rgba(212,175,55,0.3)",
-                        "0 0 40px rgba(212,175,55,0.65)",
-                        "0 0 20px rgba(212,175,55,0.3)",
-                      ],
-                    }}
-                    transition={{ duration: 1.1, repeat: Infinity, ease: "easeInOut" }}
-                    className="relative z-10 flex h-16 w-16 items-center justify-center rounded-full mb-6 shadow-[0_12px_24px_-8px_rgba(0,0,0,0.6)] ring-1 ring-[#f3d98a]/40"
-                    style={{ background: sphereGradient }}
-                  >
-                    <span className="pointer-events-none absolute top-2 start-3 h-3.5 w-6 rounded-full bg-white/40 blur-[5px]" />
-                    <span className="material-symbols-outlined relative text-3xl text-[#fbe9b8] drop-shadow-[0_0_8px_rgba(212,175,55,0.85)]">
-                      {point.icon}
-                    </span>
-                  </motion.span>
 
                   <h3 className="relative z-10 font-head text-xl font-bold text-[#354D40] mb-3 leading-snug">
                     {point.title}
@@ -482,53 +464,50 @@ export default function IPPage() {
             <p className="font-body text-[17px] leading-[1.7] text-[#F7F5EE]/80 max-w-xl mt-4 mx-auto md:mx-0">{t.services.intro}</p>
           </Reveal>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-14">
-            {t.services.grid.map((s, i) => (
-              <motion.div
-                key={s.title}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-60px" }}
-                whileHover={{ y: -8, boxShadow: "0 40px 70px -20px rgba(212,175,55,0.35)" }}
-                transition={{
-                  opacity: { duration: 0.6, delay: i * 0.08, ease: [0.22, 1, 0.36, 1] },
-                  y: { type: "spring", stiffness: 220, damping: 22 },
-                  boxShadow: { duration: 0.4 },
-                }}
-                className={`group relative pt-16 pb-10 px-8 rounded-2xl text-center shadow-[0_20px_50px_-15px_rgba(0,0,0,0.4)] ${
-                  i % 2 === 1 ? "lg:mt-10" : ""
-                }`}
-              >
-                {/* dark panel fill + gold edge + hover light-streak, clipped to the card shape */}
-                <div className="absolute inset-0 rounded-2xl overflow-hidden pointer-events-none">
-                  <div className="absolute inset-0 bg-gradient-to-br from-[#2F4A3C] via-[#2B4034] to-[#213228]" />
-                  <motion.span
-                    aria-hidden="true"
-                    className="absolute inset-y-0 -start-1/3 w-1/3 bg-gradient-to-r from-transparent via-[#D4AF37]/20 to-transparent skew-x-[-20deg]"
-                    initial={{ x: "-40%", opacity: 0 }}
-                    whileHover={{ x: "420%", opacity: 1 }}
-                    transition={{ duration: 0.9, ease: "easeInOut" }}
-                  />
-                </div>
-                <div className="absolute inset-0 rounded-2xl border border-[#D4AF37]/25 transition-colors duration-500 group-hover:border-[#D4AF37]/70 pointer-events-none" />
+          <div className="flex flex-col lg:flex-row gap-10 lg:gap-16 items-stretch">
+            {/* Featured — right column in RTL (first in DOM), primary service */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-60px" }}
+              transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+              className="lg:w-2/5 relative overflow-hidden rounded-3xl border border-[#D4AF37]/40 bg-gradient-to-br from-[#2F4A3C] via-[#2B4034] to-[#213228] p-10 md:p-12 shadow-[0_0_70px_-20px_rgba(212,175,55,0.35)] transition-shadow duration-500 hover:shadow-[0_0_90px_-15px_rgba(212,175,55,0.5)]"
+            >
+              <div className="pointer-events-none absolute -top-20 -end-20 h-64 w-64 rounded-full bg-[#D4AF37]/20 blur-[100px]" />
+              <div className="pointer-events-none absolute inset-0 rounded-3xl ring-1 ring-inset ring-[#f3d98a]/10" />
 
-                {/* floating 3D sculptural icon */}
-                <div className="absolute -top-9 inset-x-0 flex justify-center">
-                  <div
-                    className="relative h-[72px] w-[72px] rounded-full flex items-center justify-center shadow-[0_18px_30px_-10px_rgba(0,0,0,0.45)] ring-1 ring-[#f3d98a]/50"
-                    style={{ background: sphereGradient }}
-                  >
-                    <span className="pointer-events-none absolute top-2 start-4 h-4 w-7 rounded-full bg-white/40 blur-[6px]" />
-                    <span className="material-symbols-outlined relative text-3xl text-[#fbe9b8] drop-shadow-[0_0_8px_rgba(212,175,55,0.8)]">
-                      {s.icon}
-                    </span>
+              <span className="relative material-symbols-outlined text-6xl text-[#D4AF37] [text-shadow:0_0_30px_rgba(212,175,55,0.5)]">
+                {t.services.grid[0].icon}
+              </span>
+              <h3 className="relative font-head text-2xl md:text-[28px] font-bold text-[#F7F5EE] leading-snug mt-7 mb-4">
+                {t.services.grid[0].title}
+              </h3>
+              <p className="relative font-body text-base md:text-[17px] leading-[1.85] text-[#F7F5EE]/80">
+                {t.services.grid[0].body}
+              </p>
+            </motion.div>
+
+            {/* Supporting — left column in RTL, borderless stacked services */}
+            <div className="lg:w-3/5 flex flex-col divide-y divide-[#D4AF37]/20">
+              {t.services.grid.slice(1).map((s, i) => (
+                <motion.div
+                  key={s.title}
+                  initial={{ opacity: 0, y: 16 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-60px" }}
+                  transition={{ duration: 0.5, delay: 0.15 + i * 0.1, ease: [0.22, 1, 0.36, 1] }}
+                  className="group flex items-start gap-5 py-7 first:pt-0 last:pb-0"
+                >
+                  <span className="material-symbols-outlined text-2xl text-[#D4AF37] shrink-0 mt-0.5 transition-colors duration-300 group-hover:text-[#f3d98a]">
+                    {s.icon}
+                  </span>
+                  <div>
+                    <h4 className="font-head text-lg md:text-xl font-bold text-[#F7F5EE] mb-2">{s.title}</h4>
+                    <p className="font-body text-[15px] leading-[1.75] text-[#F7F5EE]/65">{s.body}</p>
                   </div>
-                </div>
-
-                <h3 className="relative font-head text-xl font-bold mb-4 text-[#F7F5EE]">{s.title}</h3>
-                <p className="relative font-body text-[16px] leading-[1.75] text-[#F7F5EE]/75">{s.body}</p>
-              </motion.div>
-            ))}
+                </motion.div>
+              ))}
+            </div>
           </div>
         </div>
       </section>

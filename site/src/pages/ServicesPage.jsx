@@ -157,13 +157,6 @@ function ModuleContent({ activeKey, t, copy }) {
           </div>
         </div>
       );
-    case "consulting":
-      return (
-        <div>
-          <ModuleHeader tag={t.consulting.tag} title={t.consulting.title} />
-          <ChecklistGrid items={t.consulting.items} />
-        </div>
-      );
     case "support":
       return (
         <div>

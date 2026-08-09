@@ -3,7 +3,10 @@ import { hero } from "../data/home";
 import { heroEn } from "../data/home.en";
 import { useLanguage } from "../lib/LanguageContext";
 
-export default function Hero() {
+// Backup of the original full hero layout (headline, subhead, description,
+// trust chips, small nav logo). Kept as a fallback in case the minimalist
+// centered-logo hero needs to be reverted. Not imported anywhere.
+export default function HeroFallback() {
   const reduceMotion = useReducedMotion();
   const { lang } = useLanguage();
   const t = lang === "en" ? heroEn : hero;
@@ -36,36 +39,68 @@ export default function Hero() {
         }}
       />
 
-      {/* Content — ultra-minimalist: centered logo medallion + actions only */}
+      {/* Content */}
       <div className="relative z-10 mx-auto flex w-full max-w-[1320px] flex-col items-center px-6 md:px-10 py-32 text-center">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.85 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 1, ease: "easeOut" }}
-          className="relative flex items-center justify-center rounded-full"
-          style={{ width: "clamp(240px, 34vw, 420px)", height: "clamp(240px, 34vw, 420px)" }}
+        <motion.p
+          initial={{ opacity: 0, y: 14 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7 }}
+          className="font-head text-base tracking-widest leading-relaxed font-medium uppercase mb-6 text-gold-light"
         >
-          {/* Outer glow ring */}
-          <div className="absolute -inset-3 rounded-full border border-gold-light/25" />
-          <div
-            className="absolute inset-0 rounded-full"
-            style={{ boxShadow: "0 40px 100px -20px rgba(197,160,89,0.55), 0 0 80px -10px rgba(197,160,89,0.25)" }}
-          />
-          {/* Medallion */}
-          <div className="relative h-full w-full rounded-full bg-cream p-9 sm:p-11 ring-1 ring-gold-light/50">
-            <img
-              src="/brand/logo-group.png"
-              alt={lang === "en" ? "Frihat Group" : "فريحات جروب"}
-              className="h-full w-full object-contain"
-            />
-          </div>
-        </motion.div>
+          {t.eyebrow}
+        </motion.p>
+
+        <motion.h1
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.1 }}
+          className="font-head font-black text-cream leading-snug max-w-3xl mx-auto text-2xl sm:text-4xl md:text-5xl [text-shadow:0_4px_30px_rgba(15,43,34,0.55)]"
+        >
+          {t.titleMain}
+        </motion.h1>
+
+        <motion.h2
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.22 }}
+          className="mt-4 font-head font-semibold text-gold-light leading-snug max-w-3xl mx-auto text-2xl sm:text-4xl md:text-5xl"
+        >
+          {t.titleSub}
+        </motion.h2>
+
+        <motion.p
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.32 }}
+          className="mt-6 max-w-3xl mx-auto text-cream/90 text-sm sm:text-base leading-relaxed"
+        >
+          {t.description}
+        </motion.p>
+
+        <motion.ul
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.42 }}
+          className="mt-9 flex flex-wrap justify-center gap-3.5"
+        >
+          {t.trust.map((item) => (
+            <li
+              key={item}
+              className="flex items-center gap-2.5 rounded-full border border-cream/20 bg-cream/10 px-5 py-2 text-base font-medium text-cream backdrop-blur-md"
+            >
+              <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-gold-light/25 text-gold-light text-xs">
+                ✓
+              </span>
+              {item}
+            </li>
+          ))}
+        </motion.ul>
 
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.4 }}
-          className="mt-12 flex flex-wrap justify-center gap-4"
+          transition={{ duration: 0.8, delay: 0.52 }}
+          className="mt-10 flex flex-wrap justify-center gap-4"
         >
           <a
             href="#contact"
